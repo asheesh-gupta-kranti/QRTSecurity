@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">QRTSecurity</string>
+    <string name="splash_message">Welcome to SAFER QRT Team</string>
+    <string name="get_started">Get Started</string>
+    <string name="sign_in">SignIn</string>
+    <string name="phone_number">Phone Number</string>
+</resources>
