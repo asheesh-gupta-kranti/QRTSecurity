@@ -32,16 +32,18 @@
             android:layout_height="wrap_content"
             android:inputType="phone"
             android:hint="@string/phone_number"
+            android:textColorHint="@color/primary_text"
+            android:textColor="@color/primary_text"
             android:drawableLeft="@drawable/mobile_icon"/>
     </android.support.design.widget.TextInputLayout>
 
     <Button
-        android:id="@+id/btn_get_started"
+        android:id="@+id/btn_sign_in"
         android:theme="@style/PrimaryButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="20dp"
-        android:text="@string/sign_in"/>
+        android:text="@string/submit"/>
 
 </LinearLayout>
