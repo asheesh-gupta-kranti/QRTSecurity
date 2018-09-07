@@ -1,10 +1,9 @@
 package poc.android.com.qrtsecurity.fragments;
 
-
 import android.content.Intent;
-import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,6 +20,8 @@ import com.android.volley.Response;
 import com.android.volley.RetryPolicy;
 import com.android.volley.VolleyError;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
@@ -33,25 +34,27 @@ import poc.android.com.qrtsecurity.utils.AppPreferencesHandler;
 import poc.android.com.qrtsecurity.utils.Constants;
 import poc.android.com.qrtsecurity.utils.HelperMethods;
 import poc.android.com.qrtsecurity.volleyWrapperClasses.UTF8JsonObjectRequest;
+import poc.android.com.qrtsecurity.volleyWrapperClasses.UTF8StringRequest;
 
-public class EnterPasswordFragment extends Fragment implements View.OnClickListener{
+public class CreatePasswordFragment extends Fragment implements View.OnClickListener{
 
-    private TextInputLayout tilPassword;
-    private EditText etPassword;
+    private TextInputLayout tilPassword, tilConfirmPassword;
+    private EditText etPassword, etConfirmPassword;
+    private Button btnSubmit;
     private ProgressBar progressBar;
-    private Button btnSubmit, btnForgotPassword;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_enter_password, container, false);
+        View view = inflater.inflate(R.layout.fragment_create_password, container, false);
         // set font for layout
 
         tilPassword = view.findViewById(R.id.til_password);
+        tilConfirmPassword = view.findViewById(R.id.til_confirm_password);
         etPassword = view.findViewById(R.id.et_password);
-        progressBar = view.findViewById(R.id.progressBar);
+        etConfirmPassword = view.findViewById(R.id.et_confirm_password);
         btnSubmit = view.findViewById(R.id.btn_submit);
-        btnForgotPassword = view.findViewById(R.id.btn_forgot_password);
+        progressBar = view.findViewById(R.id.progressBar);
 
         btnSubmit.setOnClickListener(this);
         return view;
@@ -67,9 +70,17 @@ public class EnterPasswordFragment extends Fragment implements View.OnClickListe
             tilPassword.setErrorEnabled(true);
             tilPassword.setError(getString(R.string.invalid_password));
             return false;
-        }else if (etPassword.getText().toString().contains(" ")){
+        }else if (etConfirmPassword.getText().toString().isEmpty()){
+            tilConfirmPassword.setErrorEnabled(true);
+            tilConfirmPassword.setError(getString(R.string.invalid_confirm_password));
+            return false;
+        }else if (etPassword.getText().toString().contains(" ") || etPassword.getText().toString().length() < 6){
             tilPassword.setErrorEnabled(true);
             tilPassword.setError(getString(R.string.invalid_password));
+            return false;
+        }else if (!etPassword.getText().toString().equals(etConfirmPassword.getText().toString())){
+            tilConfirmPassword.setErrorEnabled(true);
+            tilConfirmPassword.setError(getString(R.string.invalid_confirm_password));
             return false;
         }
         return true;
@@ -77,24 +88,20 @@ public class EnterPasswordFragment extends Fragment implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
-            case R.id.btn_submit:
-                if (isPasswordsValid()){
-                    progressBar.setVisibility(View.VISIBLE);
-                    loginUser(AppPreferencesHandler.getUserPhoneNumber(getActivity()), etPassword.getText().toString());
-                }
-                break;
+        if (isPasswordsValid()){
+            progressBar.setVisibility(View.VISIBLE);
+            registerUser(AppPreferencesHandler.getUserPhoneNumber(getActivity()), etPassword.getText().toString());
         }
     }
 
     /**
-     * Method to login the user using api call
+     * Method to register the user using api call
      * @param phoneNumber
      * @param password
      */
-    private void loginUser(String phoneNumber, String password) {
+    private void registerUser(String phoneNumber, String password) {
 
-        String url = Constants.baseUrl + Constants.responserLoginEndPoint ;
+        String url = Constants.baseUrl + Constants.responserAPIEndPoint ;
         JSONObject payload = new JSONObject();
         try{
 
@@ -120,15 +127,9 @@ public class EnterPasswordFragment extends Fragment implements View.OnClickListe
             }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    Log.e("error", ""+error);
-
-                    if(error.networkResponse.statusCode == 401){
-                        Toast.makeText(getActivity(), getString(R.string.invalid_password_login), Toast.LENGTH_SHORT)
-                                .show();
-                    }else {
-                        Toast.makeText(getActivity(), getString(R.string.general_error), Toast.LENGTH_SHORT)
-                                .show();
-                    }
+                                        Log.e("error", ""+error);
+                    Toast.makeText(getActivity(), getString(R.string.general_error), Toast.LENGTH_SHORT)
+                            .show();
                     progressBar.setVisibility(View.GONE);
 
                 }

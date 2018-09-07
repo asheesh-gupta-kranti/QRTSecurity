@@ -31,6 +31,7 @@ import java.util.Map;
 import poc.android.com.qrtsecurity.AppController;
 import poc.android.com.qrtsecurity.R;
 import poc.android.com.qrtsecurity.activities.MainActivity;
+import poc.android.com.qrtsecurity.utils.AppPreferencesHandler;
 import poc.android.com.qrtsecurity.utils.Constants;
 import poc.android.com.qrtsecurity.utils.HelperMethods;
 import poc.android.com.qrtsecurity.volleyWrapperClasses.UTF8StringRequest;
@@ -83,8 +84,8 @@ public class SignInFragment extends Fragment implements View.OnClickListener{
                 }else{
                     // API call to check the user is registered or not
                     progressBar.setVisibility(View.VISIBLE);
+                    AppPreferencesHandler.setUserPhoneNumber(getActivity(), etPhoneNumber.getText().toString());
                     checkIsAlreadyRegistered(etPhoneNumber.getText().toString());
-//                    callPasswordFragment();
                 }
 
                 break;
@@ -98,7 +99,19 @@ public class SignInFragment extends Fragment implements View.OnClickListener{
     private void callPasswordFragment(){
         try {
             MainActivity activity = (MainActivity) getActivity();
-            activity.addPassswordFragment();
+            activity.addPasswordFragment();
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
+
+    }
+    /**
+     * Method to call the createPasswordFragment over the current fragment
+     */
+    private void callCreatePasswordFragment(){
+        try {
+            MainActivity activity = (MainActivity) getActivity();
+            activity.addCreatePassswordFragment();
         }catch (Exception ex){
             ex.printStackTrace();
         }
@@ -120,6 +133,18 @@ public class SignInFragment extends Fragment implements View.OnClickListener{
                 public void onResponse(String response) {
 
                     Log.d("checkIsAlreadyRegistered response===", response.toString());
+                    try{
+                        JSONArray jsonArray = new JSONArray(response);
+                        if (jsonArray.length() > 0){
+                            // user is already registered
+                            callPasswordFragment();
+                        }else{
+                            // not registered
+                            callCreatePasswordFragment();
+                        }
+                    }catch (JSONException ex){
+                        ex.printStackTrace();
+                    }
                     progressBar.setVisibility(View.GONE);
 
                 }

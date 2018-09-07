@@ -15,4 +15,8 @@
     <string name="invalid_phone_number">Please enter a valid phone number.</string>
     <string name="internet_error">Please connect to internet and try again.</string>
     <string name="general_error">Something went wrong, Please try after sometime.</string>
+    <string name="invalid_password">Please enter password with minimum 6 characters.</string>
+    <string name="invalid_confirm_password">Password and confirm password don\'t match.</string>
+    <string name="success_login">Login successful</string>
+    <string name="invalid_password_login">Please enter valid password.</string>
 </resources>
