@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 
 import poc.android.com.qrtsecurity.R;
+import poc.android.com.qrtsecurity.fragments.SignInFragment;
 
 public class SplashScreenActivity extends AppCompatActivity {
 
@@ -25,7 +26,7 @@ public class SplashScreenActivity extends AppCompatActivity {
         findViewById(R.id.btn_get_started).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(SplashScreenActivity.this, SignInActivity.class));
+                startActivity(new Intent(SplashScreenActivity.this, MainActivity.class));
             }
         });
     }

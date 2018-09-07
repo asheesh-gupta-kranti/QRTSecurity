@@ -11,4 +11,8 @@
     <string name="create_password">Create Password</string>
     <string name="confirm_password">Confirm Password</string>
     <string name="submit">Submit</string>
+    <string name="enter_phone_number">Enter Phone Number</string>
+    <string name="invalid_phone_number">Please enter a valid phone number.</string>
+    <string name="internet_error">Please connect to internet and try again.</string>
+    <string name="general_error">Something went wrong, Please try after sometime.</string>
 </resources>
