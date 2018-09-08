@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.view.View;
 
 import poc.android.com.qrtsecurity.R;
+import poc.android.com.qrtsecurity.fragments.SignInFragment;
+import poc.android.com.qrtsecurity.utils.AppPreferencesHandler;
 
 public class SplashScreenActivity extends AppCompatActivity {
 
@@ -22,10 +24,17 @@ public class SplashScreenActivity extends AppCompatActivity {
      * Method to set the layout and UI elements
      */
     void setUI(){
+
+        if (AppPreferencesHandler.isLogin(this)){
+            startActivity(new Intent(SplashScreenActivity.this, CompleteProfileActivity.class));
+            finish();
+        }
         findViewById(R.id.btn_get_started).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(SplashScreenActivity.this, SignInActivity.class));
+
+                startActivity(new Intent(SplashScreenActivity.this, MainActivity.class));
+                finish();
             }
         });
     }
