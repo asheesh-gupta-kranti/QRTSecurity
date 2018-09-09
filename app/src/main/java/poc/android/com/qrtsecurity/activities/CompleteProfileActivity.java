@@ -2,6 +2,7 @@ package poc.android.com.qrtsecurity.activities;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.DatePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -14,6 +15,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -50,9 +52,20 @@ public class CompleteProfileActivity extends AppCompatActivity implements View.O
         btnProfile = findViewById(R.id.btn_profile);
         ivUploaded = findViewById(R.id.iv_uploaded);
         ivProfile = findViewById(R.id.iv_profile);
+        etDOB = findViewById(R.id.et_dob);
 
         btnUpload.setOnClickListener(this);
         btnProfile.setOnClickListener(this);
+        etDOB.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean hasFocus) {
+                if (hasFocus) {
+                    etDOB.clearFocus();
+                    showDialogDOB();
+                }
+
+            }
+        });
     }
 
     @Override
@@ -148,5 +161,23 @@ public class CompleteProfileActivity extends AppCompatActivity implements View.O
                 ivProfile.setImageURI(selectedImage);
         }
     }
+
+    /**
+     * method to show the dob dialog
+     */
+    private void showDialogDOB() {
+        DatePickerDialog datePickerDialog = new DatePickerDialog(this,
+                new DatePickerDialog.OnDateSetListener() {
+
+                    @Override
+                    public void onDateSet(DatePicker view, int year,
+                                          int monthOfYear, int dayOfMonth) {
+
+                        etDOB.setText(dayOfMonth + "-" + (monthOfYear + 1) + "-" + year);
+                    }
+                }, 1990, 1, 1);
+        datePickerDialog.show();
+    }
+
 }
 
