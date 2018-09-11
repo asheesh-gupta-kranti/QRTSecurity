@@ -125,7 +125,7 @@ public class SignInFragment extends Fragment implements View.OnClickListener{
     private void checkIsAlreadyRegistered(String phoneNumber) {
 
         String url = Constants.baseUrl + Constants.responderAPIEndPoint + "?filter={\"where\":{\"responderPhone\":\""+phoneNumber+"\"}}";
-
+        Log.d("url", url);
         if (HelperMethods.isNetWorkAvailable(getActivity())) {
             UTF8StringRequest request = new UTF8StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
 

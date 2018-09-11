@@ -189,7 +189,9 @@ public class CompleteProfileActivity extends AppCompatActivity implements View.O
      */
     private void updateUserProfile(String name, String dob, String vehicleModel, String vehicleRegNo, String drivingLicence, String gender) {
 
-        String url = Constants.baseUrl + Constants.responderProfileUpdateEndPoint + "?access_token=" + AppPreferencesHandler.getUserToken(this) ;
+        String url = Constants.baseUrl + Constants.responderProfileUpdateEndPoint +"?where={\"responderId\":"
+                +AppPreferencesHandler.getUserId(this) +"}" +  "&access_token=" + AppPreferencesHandler.getUserToken(this) ;
+        Log.d("url", url);
         JSONObject payload = new JSONObject();
         try{
 
@@ -198,7 +200,6 @@ public class CompleteProfileActivity extends AppCompatActivity implements View.O
             payload.put("vehicleRegNo", vehicleRegNo);
             payload.put("licenceNo", drivingLicence);
             payload.put("gender", gender);
-            payload.put("responderId", AppPreferencesHandler.getUserId(this));
         }catch (Exception ex){
             ex.printStackTrace();
             return;
