@@ -11,7 +11,7 @@
     <uses-feature android:name="android.hardware.camera" />
 
     <application
-        android:name=".AppController"
+        android:name="poc.android.com.qrtsecurity.AppController"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -32,10 +32,6 @@
         <activity
             android:name=".activities.CompleteProfileActivity"
             android:windowSoftInputMode="stateHidden" />
-        <activity
-            android:name=".activities.HomeActivity2"
-            android:label="@string/title_activity_home2"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

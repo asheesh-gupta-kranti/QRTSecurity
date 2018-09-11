@@ -42,4 +42,34 @@ public class AppPreferencesHandler {
         SharedPreferences prefs = context.getSharedPreferences(Constants.parentPreferenceKey, Context.MODE_PRIVATE);
         return prefs.getString(Constants.phoneNumber, "");
     }
+
+    public static void setUserToken(Context context, String token) {
+
+        SharedPreferences pref = context.getSharedPreferences(Constants.parentPreferenceKey,
+                Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = pref.edit();
+        editor.putString(Constants.token, token);
+        editor.apply();
+
+    }
+
+    public static String getUserToken(Context context) {
+        SharedPreferences prefs = context.getSharedPreferences(Constants.parentPreferenceKey, Context.MODE_PRIVATE);
+        return prefs.getString(Constants.token, "");
+    }
+
+    public static void setUserId(Context context, int id) {
+
+        SharedPreferences pref = context.getSharedPreferences(Constants.parentPreferenceKey,
+                Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = pref.edit();
+        editor.putInt(Constants.id, id);
+        editor.apply();
+
+    }
+
+    public static int getUserId(Context context) {
+        SharedPreferences prefs = context.getSharedPreferences(Constants.parentPreferenceKey, Context.MODE_PRIVATE);
+        return prefs.getInt(Constants.id, 0);
+    }
 }

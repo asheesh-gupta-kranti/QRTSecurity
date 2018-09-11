@@ -10,11 +10,14 @@ public class Constants {
     public static final String baseUrl = "http://ec2-13-232-185-241.ap-south-1.compute.amazonaws.com:3000";
 
     // API End Points
-    public static final String responserAPIEndPoint = "/api/responders";
-    public static final String responserLoginEndPoint = "/api/responders/login";
+    public static final String responderAPIEndPoint = "/api/responders";
+    public static final String responderLoginEndPoint = "/api/responders/login";
+    public static final String responderProfileUpdateEndPoint = "/api/responders/update";
 
     // Preferences keys
     public static final String parentPreferenceKey = "USER_PREFERENCES";
     public static final String isLogin = "isLogin";
     public static final String phoneNumber = "phoneNumber";
+    public static final String token = "token";
+    public static final String id = "id";
 }
