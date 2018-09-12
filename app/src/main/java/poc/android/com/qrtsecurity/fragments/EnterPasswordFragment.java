@@ -28,6 +28,8 @@ import java.util.Map;
 
 import poc.android.com.qrtsecurity.AppController;
 import poc.android.com.qrtsecurity.R;
+import poc.android.com.qrtsecurity.activities.ActivateDutyActivity;
+import poc.android.com.qrtsecurity.activities.CompleteProfileActivity;
 import poc.android.com.qrtsecurity.activities.HomeActivity;
 import poc.android.com.qrtsecurity.utils.AppPreferencesHandler;
 import poc.android.com.qrtsecurity.utils.Constants;
@@ -94,7 +96,7 @@ public class EnterPasswordFragment extends Fragment implements View.OnClickListe
      */
     private void loginUser(String phoneNumber, String password) {
 
-        String url = Constants.baseUrl + Constants.responserLoginEndPoint ;
+        String url = Constants.baseUrl + Constants.responderLoginEndPoint ;
         JSONObject payload = new JSONObject();
         try{
 
@@ -105,16 +107,28 @@ public class EnterPasswordFragment extends Fragment implements View.OnClickListe
             return;
         }
 
-        if (HelperMethods.isNetWorkAvailable(getActivity())) {
+        if (getActivity() != null && HelperMethods.isNetWorkAvailable(getActivity())) {
 
             UTF8JsonObjectRequest request = new UTF8JsonObjectRequest(Request.Method.POST, url, payload, new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
-                    Log.d("registerUser response===", response.toString());
+                    Log.d("login response", response.toString());
+
+                    try{
+                        String id = response.getString("id");
+                        int userId = response.getInt("userId");
+                        AppPreferencesHandler.setUserToken(getActivity(), id);
+                        AppPreferencesHandler.setUserId(getActivity(), userId);
+                        AppPreferencesHandler.setLoginStatus(getActivity(), true);
+                        Toast.makeText(getActivity(), getString(R.string.success_login), Toast.LENGTH_SHORT).show();
+                        openHomeActivity();
+                    }catch (Exception ex){
+                        ex.printStackTrace();
+                        Toast.makeText(getActivity(), getString(R.string.general_error), Toast.LENGTH_SHORT)
+                                .show();
+
+                    }
                     progressBar.setVisibility(View.GONE);
-                    AppPreferencesHandler.setLoginStatus(getActivity(), true);
-                    Toast.makeText(getActivity(), getString(R.string.success_login), Toast.LENGTH_SHORT).show();
-                    openHomeActivity();
 
                 }
             }, new Response.ErrorListener() {
@@ -163,7 +177,7 @@ public class EnterPasswordFragment extends Fragment implements View.OnClickListe
      * Method to open the home activity after login
      */
     private void openHomeActivity(){
-        getActivity().startActivity(new Intent(getActivity(), HomeActivity.class));
+        getActivity().startActivity(new Intent(getActivity(), ActivateDutyActivity.class));
         getActivity().finish();
     }
 }

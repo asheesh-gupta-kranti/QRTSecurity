@@ -29,6 +29,7 @@ import java.util.Map;
 
 import poc.android.com.qrtsecurity.AppController;
 import poc.android.com.qrtsecurity.R;
+import poc.android.com.qrtsecurity.activities.CompleteProfileActivity;
 import poc.android.com.qrtsecurity.activities.HomeActivity;
 import poc.android.com.qrtsecurity.utils.AppPreferencesHandler;
 import poc.android.com.qrtsecurity.utils.Constants;
@@ -101,7 +102,7 @@ public class CreatePasswordFragment extends Fragment implements View.OnClickList
      */
     private void registerUser(String phoneNumber, String password) {
 
-        String url = Constants.baseUrl + Constants.responserAPIEndPoint ;
+        String url = Constants.baseUrl + Constants.responderAPIEndPoint ;
         JSONObject payload = new JSONObject();
         try{
 
@@ -117,11 +118,8 @@ public class CreatePasswordFragment extends Fragment implements View.OnClickList
             UTF8JsonObjectRequest request = new UTF8JsonObjectRequest(Request.Method.POST, url, payload, new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
-                    Log.d("registerUser response===", response.toString());
-                    progressBar.setVisibility(View.GONE);
-                    AppPreferencesHandler.setLoginStatus(getActivity(), true);
-                    Toast.makeText(getActivity(), getString(R.string.success_login), Toast.LENGTH_SHORT).show();
-                    openHomeActivity();
+                    Log.d("registerUser response", response.toString());
+                    loginUser(AppPreferencesHandler.getUserPhoneNumber(getActivity()), etPassword.getText().toString());
 
                 }
             }, new Response.ErrorListener() {
@@ -161,10 +159,94 @@ public class CreatePasswordFragment extends Fragment implements View.OnClickList
     }
 
     /**
-     * Method to open the home activity after login
+     * Method to login the user using api call
+     * @param phoneNumber
+     * @param password
      */
-    private void openHomeActivity(){
-        getActivity().startActivity(new Intent(getActivity(), HomeActivity.class));
+    private void loginUser(String phoneNumber, String password) {
+
+        String url = Constants.baseUrl + Constants.responderLoginEndPoint ;
+        JSONObject payload = new JSONObject();
+        try{
+
+            payload.put("responderPhone", phoneNumber);
+            payload.put("password", password);
+        }catch (Exception ex){
+            ex.printStackTrace();
+            return;
+        }
+
+        if (HelperMethods.isNetWorkAvailable(getActivity())) {
+
+            UTF8JsonObjectRequest request = new UTF8JsonObjectRequest(Request.Method.POST, url, payload, new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    Log.d("login response", response.toString());
+
+                    try{
+                        String id = response.getString("id");
+                        int userId = response.getInt("userId");
+                        AppPreferencesHandler.setUserToken(getActivity(), id);
+                        AppPreferencesHandler.setUserId(getActivity(), userId);
+                        AppPreferencesHandler.setLoginStatus(getActivity(), true);
+                        Toast.makeText(getActivity(), getString(R.string.success_login), Toast.LENGTH_SHORT).show();
+                        openCompleteProfileActivity();
+                    }catch (Exception ex){
+                        ex.printStackTrace();
+                        Toast.makeText(getActivity(), getString(R.string.general_error), Toast.LENGTH_SHORT)
+                                .show();
+
+                    }
+                    progressBar.setVisibility(View.GONE);
+
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.e("error", ""+error);
+
+                    if(error.networkResponse.statusCode == 401){
+                        Toast.makeText(getActivity(), getString(R.string.invalid_password_login), Toast.LENGTH_SHORT)
+                                .show();
+                    }else {
+                        Toast.makeText(getActivity(), getString(R.string.general_error), Toast.LENGTH_SHORT)
+                                .show();
+                    }
+                    progressBar.setVisibility(View.GONE);
+
+                }
+            }){
+
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+
+                    Map<String, String> header = new HashMap<>();
+                    header.put("content-type",
+                            "application/json");
+
+                    return header;
+                }
+            };
+
+            RetryPolicy retryPolicy = new DefaultRetryPolicy(
+                    AppController.VOLLEY_TIMEOUT,
+                    AppController.VOLLEY_MAX_RETRIES,
+                    AppController.VOLLEY_BACKUP_MULT);
+            request.setRetryPolicy(retryPolicy);
+            AppController.getInstance().addToRequestQueue(request);
+
+        } else {
+            Toast.makeText(getActivity(), getString(R.string.internet_error), Toast.LENGTH_SHORT)
+                    .show();
+            progressBar.setVisibility(View.GONE);
+        }
+    }
+
+    /**
+     * Method to open the complete profile activity after login
+     */
+    private void openCompleteProfileActivity(){
+        getActivity().startActivity(new Intent(getActivity(), CompleteProfileActivity.class));
         getActivity().finish();
     }
 }

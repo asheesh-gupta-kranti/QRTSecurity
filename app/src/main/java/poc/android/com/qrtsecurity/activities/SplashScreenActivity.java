@@ -26,7 +26,7 @@ public class SplashScreenActivity extends AppCompatActivity {
     void setUI(){
 
         if (AppPreferencesHandler.isLogin(this)){
-            startActivity(new Intent(SplashScreenActivity.this, HomeActivity.class));
+            startActivity(new Intent(SplashScreenActivity.this, ActivateDutyActivity.class));
             finish();
         }
         findViewById(R.id.btn_get_started).setOnClickListener(new View.OnClickListener() {

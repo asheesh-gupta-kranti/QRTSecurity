@@ -124,15 +124,15 @@ public class SignInFragment extends Fragment implements View.OnClickListener{
      */
     private void checkIsAlreadyRegistered(String phoneNumber) {
 
-        String url = Constants.baseUrl + Constants.responserAPIEndPoint + "?filter={\"where\":{\"responderPhone\":\""+phoneNumber+"\"}}";
-
+        String url = Constants.baseUrl + Constants.responderAPIEndPoint + "?filter={\"where\":{\"responderPhone\":\""+phoneNumber+"\"}}";
+        Log.d("url", url);
         if (HelperMethods.isNetWorkAvailable(getActivity())) {
             UTF8StringRequest request = new UTF8StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
 
                 @Override
                 public void onResponse(String response) {
 
-                    Log.d("checkIsAlreadyRegistered response===", response.toString());
+                    Log.d("checkIsAlready response", response.toString());
                     try{
                         JSONArray jsonArray = new JSONArray(response);
                         if (jsonArray.length() > 0){
