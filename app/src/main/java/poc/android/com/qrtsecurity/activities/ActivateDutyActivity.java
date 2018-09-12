@@ -2,8 +2,10 @@ package poc.android.com.qrtsecurity.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -13,7 +15,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.TextView;
+
+import java.util.Calendar;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import poc.android.com.qrtsecurity.R;
 import poc.android.com.qrtsecurity.utils.AppPreferencesHandler;
@@ -21,14 +29,32 @@ import poc.android.com.qrtsecurity.utils.AppPreferencesHandler;
 public class ActivateDutyActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener {
 
     private ImageButton btnEditProfile;
+    private Button btnDutySwitch;
+    private TextView tvTimer;
+
+    private boolean isDutyOn = false;
+    private Timer timer;
+    final Handler handler = new Handler();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_activate_duty);
+
+        setUI();
+    }
+
+    /**
+     * method to set the UI elements
+     */
+    private void setUI() {
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        btnDutySwitch = findViewById(R.id.btn_duty_switch);
+        tvTimer = findViewById(R.id.tv_timer);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -42,6 +68,14 @@ public class ActivateDutyActivity extends AppCompatActivity implements Navigatio
         btnEditProfile = headerView.findViewById(R.id.btn_edit_profile);
 
         btnEditProfile.setOnClickListener(this);
+        btnDutySwitch.setOnClickListener(this);
+
+        if (AppPreferencesHandler.getDutyState(this)) {
+            startDuty();
+        } else {
+            stopDuty();
+        }
+
     }
 
     @Override
@@ -79,10 +113,110 @@ public class ActivateDutyActivity extends AppCompatActivity implements Navigatio
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.btn_edit_profile:
                 startActivity(new Intent(this, CompleteProfileActivity.class));
                 break;
+
+            case R.id.btn_duty_switch:
+
+                if (isDutyOn) {
+                    AppPreferencesHandler.setDutyState(this, false);
+                    Log.d("Duty","OFF");
+                    stopDuty();
+                } else {
+                    AppPreferencesHandler.setDutyStartTime(this, Calendar.getInstance().getTimeInMillis());
+                    AppPreferencesHandler.setDutyState(this, true);
+                    Log.d("Duty","ON");
+                    startDuty();
+                }
+                break;
         }
     }
+
+    private void startDuty() {
+        isDutyOn = true;
+        btnDutySwitch.setBackgroundResource(R.drawable.duty_on_bg);
+        btnDutySwitch.setText(getString(R.string.duty_on));
+        tvTimer.setText(getDutyTimer());
+        Log.d("Duty","Start Timer");
+        startTimer();
+    }
+
+    private void stopDuty() {
+        isDutyOn = false;
+        btnDutySwitch.setBackgroundResource(R.drawable.duty_off_bg);
+        btnDutySwitch.setText(getString(R.string.duty_off));
+        tvTimer.setText("00:00");
+
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        stopTimer();
+    }
+
+    private void startTimer() {
+
+        //set a new Timer
+
+        timer = new Timer();
+
+        //initialize the TimerTask's job
+
+        TimerTask timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                handler.post(new Runnable() {
+                    public void run() {
+                        Log.d("Duty","Set time");
+                        tvTimer.setText(getDutyTimer());
+
+                    }
+                });
+            }
+        };
+
+
+        //schedule the timer, after the first 0ms the TimerTask will run every 10000ms
+
+        timer.schedule(timerTask, 0, 60000);
+
+    }
+
+    /**
+     * method to get the duty duration in string
+     *
+     * @return
+     */
+    private String getDutyTimer() {
+
+        long duration = getDutyDuration();
+
+        if (duration < 0) {
+            Log.d("Duty","zero duration");
+            return "00:00";
+        } else {
+            Log.d("Duty"," duration::"+ duration);
+            long mins = duration / 60000;
+            return "" + String.format("%02d",(mins / 60)) + ":" +  String.format("%02d",(mins % 60));
+        }
+
+    }
+
+    private long getDutyDuration() {
+        long currentTime = Calendar.getInstance().getTimeInMillis();
+        long startedTime = AppPreferencesHandler.getDutyStartTime(this);
+
+        return currentTime - startedTime;
+    }
+
+    private void stopTimer() {
+        if (timer != null) {
+            timer.cancel();
+            timer = null;
+        }
+    }
+
 }

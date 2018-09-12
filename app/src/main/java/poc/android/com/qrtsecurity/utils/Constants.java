@@ -20,4 +20,6 @@ public class Constants {
     public static final String phoneNumber = "phoneNumber";
     public static final String token = "token";
     public static final String id = "id";
-}
+    public static final String dutyStartTime = "dutyStartTime";
+    public static final String dutyState = "dutyState";
+;}
