@@ -5,6 +5,8 @@ import android.content.SharedPreferences;
 
 import java.util.Calendar;
 
+import poc.android.com.qrtsecurity.Models.ResponderModel;
+
 /**
  * Created by ashutoshmishra on 07/09/18.
  */
@@ -99,5 +101,21 @@ public class AppPreferencesHandler {
     public static boolean getDutyState(Context context) {
         SharedPreferences prefs = context.getSharedPreferences(Constants.parentPreferenceKey, Context.MODE_PRIVATE);
         return prefs.getBoolean(Constants.dutyState, false);
+    }
+
+    public static void saveUserDetails(Context context, ResponderModel user){
+        SharedPreferences pref = context.getSharedPreferences(Constants.parentPreferenceKey,
+                Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = pref.edit();
+        editor.putString(Constants.name, user.getResponderName());
+        editor.putString(Constants.phoneNumber, user.getResponderPhone());
+        editor.putInt(Constants.id, user.getResponderId());
+        editor.putString(Constants.dob, user.getDob());
+        editor.putString(Constants.vehicleRegNo, user.getVehicleRegNo());
+        editor.putString(Constants.licenceNo, user.getLicenceNo());
+        editor.putString(Constants.gender, user.getGender());
+
+        editor.apply();
+
     }
 }

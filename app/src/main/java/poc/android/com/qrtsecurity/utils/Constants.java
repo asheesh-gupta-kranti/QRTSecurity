@@ -18,6 +18,11 @@ public class Constants {
     public static final String parentPreferenceKey = "USER_PREFERENCES";
     public static final String isLogin = "isLogin";
     public static final String phoneNumber = "phoneNumber";
+    public static final String name = "name";
+    public static final String vehicleRegNo = "vehicleRegNo";
+    public static final String licenceNo = "licenceNo";
+    public static final String gender = "gender";
+    public static final String dob = "dob";
     public static final String token = "token";
     public static final String id = "id";
     public static final String dutyStartTime = "dutyStartTime";

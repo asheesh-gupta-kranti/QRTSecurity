@@ -137,6 +137,8 @@ public class SignInFragment extends Fragment implements View.OnClickListener{
                         JSONArray jsonArray = new JSONArray(response);
                         if (jsonArray.length() > 0){
                             // user is already registered
+
+
                             callPasswordFragment();
                         }else{
                             // not registered

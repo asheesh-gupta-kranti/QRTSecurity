@@ -112,7 +112,7 @@ public class CreatePasswordFragment extends Fragment implements View.OnClickList
             ex.printStackTrace();
             return;
         }
-
+        Log.d("register params", payload.toString());
         if (HelperMethods.isNetWorkAvailable(getActivity())) {
 
             UTF8JsonObjectRequest request = new UTF8JsonObjectRequest(Request.Method.POST, url, payload, new Response.Listener<JSONObject>() {
