@@ -23,6 +23,7 @@ import java.util.Calendar;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import poc.android.com.qrtsecurity.Models.ResponderModel;
 import poc.android.com.qrtsecurity.R;
 import poc.android.com.qrtsecurity.utils.AppPreferencesHandler;
 
@@ -30,7 +31,7 @@ public class ActivateDutyActivity extends AppCompatActivity implements Navigatio
 
     private ImageButton btnEditProfile;
     private Button btnDutySwitch;
-    private TextView tvTimer;
+    private TextView tvTimer, tvName, tvModel;
 
     private boolean isDutyOn = false;
     private Timer timer;
@@ -66,6 +67,12 @@ public class ActivateDutyActivity extends AppCompatActivity implements Navigatio
         navigationView.setNavigationItemSelectedListener(this);
         View headerView = navigationView.getHeaderView(0);
         btnEditProfile = headerView.findViewById(R.id.btn_edit_profile);
+        tvName = headerView.findViewById(R.id.tv_name);
+        tvModel = headerView.findViewById(R.id.tv_model);
+
+        ResponderModel user = AppPreferencesHandler.getUserDetails(this);
+        tvName.setText(user.getResponderName());
+        tvModel.setText(user.getVehicleRegNo());
 
         btnEditProfile.setOnClickListener(this);
         btnDutySwitch.setOnClickListener(this);

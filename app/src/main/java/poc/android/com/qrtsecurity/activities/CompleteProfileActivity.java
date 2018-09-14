@@ -17,6 +17,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -39,6 +40,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import poc.android.com.qrtsecurity.AppController;
+import poc.android.com.qrtsecurity.Models.ResponderModel;
 import poc.android.com.qrtsecurity.R;
 import poc.android.com.qrtsecurity.utils.AppPreferencesHandler;
 import poc.android.com.qrtsecurity.utils.Constants;
@@ -121,6 +123,32 @@ public class CompleteProfileActivity extends AppCompatActivity implements View.O
                 }
             }
         });
+
+        setSavedUserValue();
+    }
+
+    /**
+     * method to set the save user profile data
+     */
+    private void setSavedUserValue(){
+        ResponderModel user = AppPreferencesHandler.getUserDetails(this);
+
+        if (!user.getResponderName().isEmpty()){
+
+            etName.setText(user.getResponderName());
+            etDOB.setText(user.getDob());
+            etDrivingNo.setText(user.getLicenceNo());
+            etVehicleModel.setText("");
+            etVehicleRegNo.setText(user.getVehicleRegNo());
+
+            if (user.getGender().equalsIgnoreCase("female")){
+                RadioButton rbFemale = findViewById(R.id.rb_female);
+                rbFemale.setChecked(true);
+            }else{
+                RadioButton rbMale = findViewById(R.id.rb_male);
+                rbMale.setChecked(true);
+            }
+        }
     }
 
     @Override
