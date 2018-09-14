@@ -118,4 +118,18 @@ public class AppPreferencesHandler {
         editor.apply();
 
     }
+
+    public static ResponderModel getUserDetails(Context context){
+        SharedPreferences prefs = context.getSharedPreferences(Constants.parentPreferenceKey, Context.MODE_PRIVATE);
+        ResponderModel user = new ResponderModel();
+        user.setResponderName(prefs.getString(Constants.name, ""));
+        user.setResponderPhone(prefs.getString(Constants.phoneNumber, ""));
+        user.setResponderId(prefs.getInt(Constants.id, 0));
+        user.setDob(prefs.getString(Constants.dob, ""));
+        user.setVehicleRegNo(prefs.getString(Constants.vehicleRegNo, ""));
+        user.setLicenceNo(prefs.getString(Constants.licenceNo, ""));
+        user.setGender(prefs.getString(Constants.gender, "MALE"));
+
+        return user;
+    }
 }

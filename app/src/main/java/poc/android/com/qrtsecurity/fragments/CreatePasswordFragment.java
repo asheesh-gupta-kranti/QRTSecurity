@@ -19,6 +19,7 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.RetryPolicy;
 import com.android.volley.VolleyError;
+import com.google.gson.Gson;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -28,6 +29,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import poc.android.com.qrtsecurity.AppController;
+import poc.android.com.qrtsecurity.Models.ResponderModel;
 import poc.android.com.qrtsecurity.R;
 import poc.android.com.qrtsecurity.activities.CompleteProfileActivity;
 import poc.android.com.qrtsecurity.activities.HomeActivity;
@@ -189,15 +191,13 @@ public class CreatePasswordFragment extends Fragment implements View.OnClickList
                         AppPreferencesHandler.setUserToken(getActivity(), id);
                         AppPreferencesHandler.setUserId(getActivity(), userId);
                         AppPreferencesHandler.setLoginStatus(getActivity(), true);
-                        Toast.makeText(getActivity(), getString(R.string.success_login), Toast.LENGTH_SHORT).show();
-                        openCompleteProfileActivity();
+                        getUserDetails(userId);
                     }catch (Exception ex){
                         ex.printStackTrace();
                         Toast.makeText(getActivity(), getString(R.string.general_error), Toast.LENGTH_SHORT)
                                 .show();
 
                     }
-                    progressBar.setVisibility(View.GONE);
 
                 }
             }, new Response.ErrorListener() {
@@ -248,5 +248,64 @@ public class CreatePasswordFragment extends Fragment implements View.OnClickList
     private void openCompleteProfileActivity(){
         getActivity().startActivity(new Intent(getActivity(), CompleteProfileActivity.class));
         getActivity().finish();
+    }
+
+    /**
+     * method to get the user details
+     *
+     * @param id
+     */
+    private void getUserDetails(int id) {
+
+        String url = Constants.baseUrl + Constants.responderAPIEndPoint + "/" + id;
+        Log.d("url", url);
+        if (HelperMethods.isNetWorkAvailable(getActivity())) {
+            UTF8StringRequest request = new UTF8StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
+
+                @Override
+                public void onResponse(String response) {
+
+                    Log.d("getUserDetails response", response.toString());
+                    ResponderModel user = new Gson().fromJson(response.toString(), ResponderModel.class);
+                    AppPreferencesHandler.saveUserDetails(CreatePasswordFragment.this.getActivity(), user);
+                    Toast.makeText(getActivity(), getString(R.string.success_login), Toast.LENGTH_SHORT).show();
+                    openCompleteProfileActivity();
+                    progressBar.setVisibility(View.GONE);
+                }
+            }, new Response.ErrorListener() {
+
+                @Override
+                public void onErrorResponse(VolleyError error) {
+
+                    Log.e("error", "" + error);
+                    Toast.makeText(getActivity(), getString(R.string.general_error), Toast.LENGTH_SHORT)
+                            .show();
+                    progressBar.setVisibility(View.GONE);
+                }
+            }) {
+
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+
+                    Map<String, String> header = new HashMap<>();
+                    header.put("content-type",
+                            "application/json");
+
+                    return header;
+                }
+            };
+
+            RetryPolicy retryPolicy = new DefaultRetryPolicy(
+                    AppController.VOLLEY_TIMEOUT,
+                    AppController.VOLLEY_MAX_RETRIES,
+                    AppController.VOLLEY_BACKUP_MULT);
+            request.setRetryPolicy(retryPolicy);
+            AppController.getInstance().addToRequestQueue(request);
+
+        } else {
+            Toast.makeText(getActivity(), getString(R.string.internet_error), Toast.LENGTH_SHORT)
+                    .show();
+            progressBar.setVisibility(View.GONE);
+        }
     }
 }
