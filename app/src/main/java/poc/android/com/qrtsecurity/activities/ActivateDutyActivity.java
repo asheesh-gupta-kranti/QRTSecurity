@@ -25,6 +25,7 @@ import java.util.TimerTask;
 
 import poc.android.com.qrtsecurity.Models.ResponderModel;
 import poc.android.com.qrtsecurity.R;
+import poc.android.com.qrtsecurity.services.ResponderLocationService;
 import poc.android.com.qrtsecurity.utils.AppPreferencesHandler;
 
 public class ActivateDutyActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener {
@@ -131,14 +132,32 @@ public class ActivateDutyActivity extends AppCompatActivity implements Navigatio
                     AppPreferencesHandler.setDutyState(this, false);
                     Log.d("Duty","OFF");
                     stopDuty();
+                    stopLocationService();
                 } else {
                     AppPreferencesHandler.setDutyStartTime(this, Calendar.getInstance().getTimeInMillis());
                     AppPreferencesHandler.setDutyState(this, true);
                     Log.d("Duty","ON");
                     startDuty();
+                    startLocationService();
                 }
                 break;
         }
+    }
+
+    /**
+     * method to start the service which will monitor the responder location
+     */
+    private void startLocationService(){
+        Intent serviceIntent = new Intent(this, ResponderLocationService.class);
+        startService(serviceIntent);
+    }
+
+    /**
+     * method to stop the service which will monitor the responder location
+     */
+    private void stopLocationService(){
+        Intent serviceIntent = new Intent(this, ResponderLocationService.class);
+        stopService(serviceIntent);
     }
 
     private void startDuty() {
@@ -186,9 +205,9 @@ public class ActivateDutyActivity extends AppCompatActivity implements Navigatio
         };
 
 
-        //schedule the timer, after the first 0ms the TimerTask will run every 10000ms
+        //schedule the timer, after the first 0ms the TimerTask will run every 2000ms
 
-        timer.schedule(timerTask, 0, 60000);
+        timer.schedule(timerTask, 0, 2000);
 
     }
 
@@ -203,11 +222,12 @@ public class ActivateDutyActivity extends AppCompatActivity implements Navigatio
 
         if (duration < 0) {
             Log.d("Duty","zero duration");
-            return "00:00";
+            return "00:00:00";
         } else {
             Log.d("Duty"," duration::"+ duration);
             long mins = duration / 60000;
-            return "" + String.format("%02d",(mins / 60)) + ":" +  String.format("%02d",(mins % 60));
+            return "" + String.format("%02d",(mins / 60)) + ":" +  String.format("%02d",(mins % 60)) + ":" +
+                    String.format("%02d", ((duration % 60000) / 1000));
         }
 
     }
