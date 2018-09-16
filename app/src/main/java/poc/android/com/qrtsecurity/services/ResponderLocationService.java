@@ -1,22 +1,34 @@
 package poc.android.com.qrtsecurity.services;
 
+import android.Manifest;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.widget.Toast;
 
+import poc.android.com.qrtsecurity.R;
+
+import static android.app.NotificationManager.IMPORTANCE_HIGH;
+
 public class ResponderLocationService extends Service {
     private static final String TAG = "MyLocationService";
     private LocationManager mLocationManager = null;
-    private static final int LOCATION_INTERVAL = 5000; // 5 sec
-    private static final float LOCATION_DISTANCE = 10f; // 10 meters
+    private static final int LOCATION_INTERVAL = 1; // 1 min
+    private static final float LOCATION_DISTANCE = 2f; // 10 meters
+    public static String CHANNEL_ONE_ID = "com.qrtservices";
+    public static final int foregroundServiceId = 100;
 
     private class LocationListener implements android.location.LocationListener {
         Location mLastLocation;
@@ -79,18 +91,46 @@ public class ResponderLocationService extends Service {
 
         initializeLocationManager();
 
-        try {
-            mLocationManager.requestLocationUpdates(
-                    LocationManager.PASSIVE_PROVIDER,
-                    LOCATION_INTERVAL,
-                    LOCATION_DISTANCE,
-                    mLocationListeners[0]
-            );
-        } catch (java.lang.SecurityException ex) {
-            Log.i(TAG, "fail to request location update, ignore", ex);
-        } catch (IllegalArgumentException ex) {
-            Log.d(TAG, "network provider does not exist, " + ex.getMessage());
+        if (mLocationManager.getAllProviders() != null ) {
+
+            if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
+                    checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+                            != PackageManager.PERMISSION_GRANTED) {
+
+                // permission not granted
+                return;
+            }
+            if (mLocationManager.getAllProviders().contains(LocationManager.NETWORK_PROVIDER)) {
+                try {
+                    mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, LOCATION_INTERVAL, LOCATION_DISTANCE, mLocationListeners[0]);
+                    showNotification();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            //Or  Register the listener with Location Manager's gps provider
+            if (mLocationManager.getAllProviders().contains(LocationManager.GPS_PROVIDER)) {
+                try {
+                    mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, LOCATION_INTERVAL, LOCATION_DISTANCE, mLocationListeners[0]);
+                    showNotification();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
         }
+
+//        try {
+//            mLocationManager.requestLocationUpdates(
+//                    LocationManager.GPS_PROVIDER,
+//                    LOCATION_INTERVAL,
+//                    LOCATION_DISTANCE,
+//                    mLocationListeners[0]
+//            );
+//        } catch (java.lang.SecurityException ex) {
+//            Log.i(TAG, "fail to request location update, ignore", ex);
+//        } catch (IllegalArgumentException ex) {
+//            Log.d(TAG, "network provider does not exist, " + ex.getMessage());
+//        }
 
         /*try {
             mLocationManager.requestLocationUpdates(
@@ -104,6 +144,37 @@ public class ResponderLocationService extends Service {
         } catch (IllegalArgumentException ex) {
             Log.d(TAG, "gps provider does not exist " + ex.getMessage());
         }*/
+    }
+
+    private void showNotification(){
+        Notification notification = null;
+        NotificationChannel notificationChannel = null;
+       if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+           notificationChannel = new NotificationChannel(CHANNEL_ONE_ID,
+                        "Location service", IMPORTANCE_HIGH);
+            notificationChannel.enableLights(true);
+            notificationChannel.setLightColor(Color.RED);
+            notificationChannel.setShowBadge(true);
+            notificationChannel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
+            NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+            manager.createNotificationChannel(notificationChannel);
+            notification = new Notification.Builder(getApplicationContext())
+                    .setChannelId(CHANNEL_ONE_ID)
+                    .setContentTitle(getString(R.string.app_name))
+                    .setContentText("We are monitoring your location.")
+                    .setSmallIcon(R.mipmap.ic_launcher)
+                    .build();
+        }else{
+            notification = new Notification.Builder(getApplicationContext())
+                    .setContentTitle(getString(R.string.app_name))
+                    .setContentText("We are monitoring your location.")
+                    .setSmallIcon(R.mipmap.ic_launcher)
+                    .build();
+
+        }
+
+        // Start foreground service
+        startForeground(foregroundServiceId, notification);
     }
 
     @Override

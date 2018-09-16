@@ -1,8 +1,12 @@
 package poc.android.com.qrtsecurity.activities;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
@@ -18,6 +22,7 @@ import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.Calendar;
 import java.util.Timer;
@@ -30,6 +35,8 @@ import poc.android.com.qrtsecurity.utils.AppPreferencesHandler;
 
 public class ActivateDutyActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener {
 
+    private static final int LOCATION_REQUEST = 1003;
+    private static final int LOCATION_PERMISSION_CODE = 102;
     private ImageButton btnEditProfile;
     private Button btnDutySwitch;
     private TextView tvTimer, tvName, tvModel;
@@ -78,11 +85,11 @@ public class ActivateDutyActivity extends AppCompatActivity implements Navigatio
         btnEditProfile.setOnClickListener(this);
         btnDutySwitch.setOnClickListener(this);
 
-        if (AppPreferencesHandler.getDutyState(this)) {
-            startDuty();
-        } else {
-            stopDuty();
-        }
+//        if (AppPreferencesHandler.getDutyState(this)) {
+//            startDuty();
+//        } else {
+//            stopDuty();
+//        }
 
     }
 
@@ -138,9 +145,31 @@ public class ActivateDutyActivity extends AppCompatActivity implements Navigatio
                     AppPreferencesHandler.setDutyState(this, true);
                     Log.d("Duty","ON");
                     startDuty();
-                    startLocationService();
+
+                    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
+                            checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+                                    != PackageManager.PERMISSION_GRANTED) {
+                        requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                                LOCATION_PERMISSION_CODE);
+                    } else {
+                        startLocationService();
+                    }
+
                 }
                 break;
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == LOCATION_PERMISSION_CODE) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+               startLocationService();
+            } else {
+                Toast.makeText(this, "location permission denied", Toast.LENGTH_LONG).show();
+            }
+
         }
     }
 
@@ -148,8 +177,23 @@ public class ActivateDutyActivity extends AppCompatActivity implements Navigatio
      * method to start the service which will monitor the responder location
      */
     private void startLocationService(){
-        Intent serviceIntent = new Intent(this, ResponderLocationService.class);
-        startService(serviceIntent);
+//        Intent serviceIntent = new Intent(this, ResponderLocationService.class);
+//        startService(serviceIntent);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+
+            try{
+                Intent foregroundIntent = new Intent(this, ResponderLocationService.class);
+                this.startForegroundService(foregroundIntent);
+            }catch (Exception ex){
+               ex.printStackTrace();
+            }
+
+        }else{
+            Intent foregroundIntent = new Intent(this, ResponderLocationService.class);
+            this.startService(foregroundIntent);
+
+        }
     }
 
     /**
@@ -165,7 +209,7 @@ public class ActivateDutyActivity extends AppCompatActivity implements Navigatio
         btnDutySwitch.setBackgroundResource(R.drawable.duty_on_bg);
         btnDutySwitch.setText(getString(R.string.duty_on));
         tvTimer.setText(getDutyTimer());
-        Log.d("Duty","Start Timer");
+//        Log.d("Duty","Start Timer");
         startTimer();
     }
 
@@ -173,8 +217,19 @@ public class ActivateDutyActivity extends AppCompatActivity implements Navigatio
         isDutyOn = false;
         btnDutySwitch.setBackgroundResource(R.drawable.duty_off_bg);
         btnDutySwitch.setText(getString(R.string.duty_off));
-        tvTimer.setText("00:00");
+        tvTimer.setText("00:00:00");
+        stopTimer();
+    }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        if (AppPreferencesHandler.getDutyState(this)){
+            startDuty();
+        }else{
+            stopDuty();
+        }
     }
 
     @Override
@@ -186,7 +241,7 @@ public class ActivateDutyActivity extends AppCompatActivity implements Navigatio
     private void startTimer() {
 
         //set a new Timer
-
+        Log.d("timer", "Strat Timer");
         timer = new Timer();
 
         //initialize the TimerTask's job
@@ -196,7 +251,7 @@ public class ActivateDutyActivity extends AppCompatActivity implements Navigatio
             public void run() {
                 handler.post(new Runnable() {
                     public void run() {
-                        Log.d("Duty","Set time");
+//                        Log.d("Duty","Set time");
                         tvTimer.setText(getDutyTimer());
 
                     }
