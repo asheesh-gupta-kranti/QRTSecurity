@@ -132,4 +132,19 @@ public class AppPreferencesHandler {
 
         return user;
     }
+
+    public static void setScheduleId(Context context, int id) {
+
+        SharedPreferences pref = context.getSharedPreferences(Constants.parentPreferenceKey,
+                Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = pref.edit();
+        editor.putInt(Constants.scheduleId, id);
+        editor.apply();
+
+    }
+
+    public static int getScheduleId(Context context) {
+        SharedPreferences prefs = context.getSharedPreferences(Constants.parentPreferenceKey, Context.MODE_PRIVATE);
+        return prefs.getInt(Constants.scheduleId, -1);
+    }
 }

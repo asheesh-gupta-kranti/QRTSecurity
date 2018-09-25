@@ -13,6 +13,7 @@ public class Constants {
     public static final String responderAPIEndPoint = "/api/responders";
     public static final String responderLoginEndPoint = "/api/responders/login";
     public static final String responderProfileUpdateEndPoint = "/api/responders/update";
+    public static final String responderScheduleEndPoint = "/api/responders/%d/schedules";
 
     // Preferences keys
     public static final String parentPreferenceKey = "USER_PREFERENCES";
@@ -27,4 +28,5 @@ public class Constants {
     public static final String id = "id";
     public static final String dutyStartTime = "dutyStartTime";
     public static final String dutyState = "dutyState";
+    public static final String scheduleId = "scheduleId";
 ;}

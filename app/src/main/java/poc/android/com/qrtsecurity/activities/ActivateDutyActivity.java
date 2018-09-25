@@ -1,8 +1,14 @@
 package poc.android.com.qrtsecurity.activities;
 
 import android.Manifest;
+import android.animation.ObjectAnimator;
+import android.animation.PropertyValuesHolder;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.drawable.AnimationDrawable;
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.shapes.RoundRectShape;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -24,22 +30,45 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.RetryPolicy;
+import com.android.volley.VolleyError;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import poc.android.com.qrtsecurity.AppController;
 import poc.android.com.qrtsecurity.Models.ResponderModel;
 import poc.android.com.qrtsecurity.R;
 import poc.android.com.qrtsecurity.services.ResponderLocationService;
 import poc.android.com.qrtsecurity.utils.AppPreferencesHandler;
+import poc.android.com.qrtsecurity.utils.Constants;
+import poc.android.com.qrtsecurity.utils.HelperMethods;
+import poc.android.com.qrtsecurity.volleyWrapperClasses.UTF8JsonObjectRequest;
+import poc.android.com.qrtsecurity.volleyWrapperClasses.UTF8StringRequest;
 
 public class ActivateDutyActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener {
 
     private static final int LOCATION_REQUEST = 1003;
     private static final int LOCATION_PERMISSION_CODE = 102;
+    private static final int POST_DUTY_API = 101;
+    private static final int PUT_DUTY_API = 102;
+    private static final int GET_DUTY_API = 103;
+
     private ImageButton btnEditProfile;
     private Button btnDutySwitch;
     private TextView tvTimer, tvName, tvModel;
+    ObjectAnimator objAnim;
+    private int apiStatus = -1;
 
     private boolean isDutyOn = false;
     private Timer timer;
@@ -93,6 +122,21 @@ public class ActivateDutyActivity extends AppCompatActivity implements Navigatio
 
     }
 
+//    private void pulseAnimation(){
+//        objAnim= ObjectAnimator.ofPropertyValuesHolder(btnDutySwitch, PropertyValuesHolder.ofFloat("scaleX", 1.5f), PropertyValuesHolder.ofFloat("scaleY", 1.5f));
+//        objAnim.setDuration(300);
+//        objAnim.setRepeatCount(ObjectAnimator.INFINITE);
+//        objAnim.setRepeatMode(ObjectAnimator.REVERSE);
+//        objAnim.start();
+//    }
+//
+////To Stop Animation, simply use cancel method of ObjectAnimator object as below.
+//
+//    private void stopPulseAnimation(){
+//        objAnim.cancel();
+//    }
+
+
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -138,23 +182,13 @@ public class ActivateDutyActivity extends AppCompatActivity implements Navigatio
                 if (isDutyOn) {
                     AppPreferencesHandler.setDutyState(this, false);
                     Log.d("Duty","OFF");
-                    stopDuty();
-                    stopLocationService();
+                    putSchedule();
+
                 } else {
                     AppPreferencesHandler.setDutyStartTime(this, Calendar.getInstance().getTimeInMillis());
                     AppPreferencesHandler.setDutyState(this, true);
                     Log.d("Duty","ON");
-                    startDuty();
-
-                    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
-                            checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)
-                                    != PackageManager.PERMISSION_GRANTED) {
-                        requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                                LOCATION_PERMISSION_CODE);
-                    } else {
-                        startLocationService();
-                    }
-
+                    postSchedule();
                 }
                 break;
         }
@@ -209,6 +243,7 @@ public class ActivateDutyActivity extends AppCompatActivity implements Navigatio
         btnDutySwitch.setBackgroundResource(R.drawable.duty_on_bg);
         btnDutySwitch.setText(getString(R.string.duty_on));
         tvTimer.setText(getDutyTimer());
+//        pulseAnimation();
 //        Log.d("Duty","Start Timer");
         startTimer();
     }
@@ -218,6 +253,7 @@ public class ActivateDutyActivity extends AppCompatActivity implements Navigatio
         btnDutySwitch.setBackgroundResource(R.drawable.duty_off_bg);
         btnDutySwitch.setText(getString(R.string.duty_off));
         tvTimer.setText("00:00:00");
+//        stopPulseAnimation();
         stopTimer();
     }
 
@@ -298,6 +334,179 @@ public class ActivateDutyActivity extends AppCompatActivity implements Navigatio
         if (timer != null) {
             timer.cancel();
             timer = null;
+        }
+    }
+
+    private Response.Listener<String> responseListener = new Response.Listener<String>() {
+        @Override
+        public void onResponse(String response) {
+            Log.d("response", ""+response);
+            switch (apiStatus){
+                case POST_DUTY_API:
+                    startDuty();
+                    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
+                            checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+                                    != PackageManager.PERMISSION_GRANTED) {
+                        requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                                LOCATION_PERMISSION_CODE);
+                    } else {
+                        startLocationService();
+                    }
+
+                    getSchedules();
+                    Toast.makeText(ActivateDutyActivity.this, "Duty Started.", Toast.LENGTH_SHORT).show();
+                    break;
+
+                case GET_DUTY_API:
+                    try {
+                        JSONArray jsonArray = new JSONArray(response);
+                        if (jsonArray.length() > 0){
+                            JSONObject jsonObject = jsonArray.getJSONObject(jsonArray.length() - 1);
+                            int sId = jsonObject.getInt("sId");
+                            AppPreferencesHandler.setScheduleId(getApplicationContext(), sId);
+                            Toast.makeText(ActivateDutyActivity.this, "Schedule ID:"+ sId, Toast.LENGTH_SHORT).show();
+                        }
+                    }catch (Exception ex){
+                        ex.printStackTrace();
+                    }
+                    break;
+                    
+                case PUT_DUTY_API:
+                    stopDuty();
+                    stopLocationService();
+                    Toast.makeText(ActivateDutyActivity.this, "Duty Stoped", Toast.LENGTH_SHORT).show();
+                    break;
+            }
+
+        }
+    };
+
+    private Response.ErrorListener errorListener = new Response.ErrorListener() {
+        @Override
+        public void onErrorResponse(VolleyError error) {
+            Log.e("error", ""+error.getLocalizedMessage());
+        }
+    };
+
+
+    private void postSchedule() {
+
+        apiStatus = POST_DUTY_API;
+        String url = Constants.baseUrl + String.format(Constants.responderScheduleEndPoint, AppPreferencesHandler.getUserId(this));
+        Log.d("url", url);
+        JSONObject payload = new JSONObject();
+
+        Log.d("payload", payload.toString());
+        if (HelperMethods.isNetWorkAvailable(this)) {
+
+            UTF8StringRequest request = new UTF8StringRequest(Request.Method.POST, url, responseListener, errorListener)
+            {
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+
+                    Map<String, String> header = new HashMap<>();
+                    header.put("Content-Type",
+                            "application/json");
+                    header.put("Authorization",  AppPreferencesHandler.getUserToken(ActivateDutyActivity.this));
+
+                    return header;
+                }
+            };
+
+            RetryPolicy retryPolicy = new DefaultRetryPolicy(
+                    AppController.VOLLEY_TIMEOUT,
+                    AppController.VOLLEY_MAX_RETRIES,
+                    AppController.VOLLEY_BACKUP_MULT);
+            request.setRetryPolicy(retryPolicy);
+            AppController.getInstance().addToRequestQueue(request);
+
+        } else {
+            Toast.makeText(this, getString(R.string.internet_error), Toast.LENGTH_SHORT)
+                    .show();
+
+        }
+    }
+
+    private void putSchedule() {
+
+        apiStatus = PUT_DUTY_API;
+        String url = Constants.baseUrl + String.format(Constants.responderScheduleEndPoint, AppPreferencesHandler.getUserId(this)) +
+                "/"+ AppPreferencesHandler.getScheduleId(getApplicationContext());
+        Log.d("url", url);
+        JSONObject payload = new JSONObject();
+
+        Log.d("payload", payload.toString());
+        if (HelperMethods.isNetWorkAvailable(this)) {
+
+            UTF8StringRequest request = new UTF8StringRequest(Request.Method.PUT, url, responseListener, errorListener)
+            {
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+
+                    Map<String, String> header = new HashMap<>();
+                    header.put("Content-Type","application/x-www-form-urlencoded");
+                    header.put("Authorization",  AppPreferencesHandler.getUserToken(ActivateDutyActivity.this));
+
+                    return header;
+                }
+
+                @Override
+                protected Map<String,String> getParams(){
+                    Map<String,String> params = new HashMap<String, String>();
+                    params.put("currAvail", "false");
+                    return params;
+                }
+            };
+
+            RetryPolicy retryPolicy = new DefaultRetryPolicy(
+                    AppController.VOLLEY_TIMEOUT,
+                    AppController.VOLLEY_MAX_RETRIES,
+                    AppController.VOLLEY_BACKUP_MULT);
+            request.setRetryPolicy(retryPolicy);
+            AppController.getInstance().addToRequestQueue(request);
+
+        } else {
+            Toast.makeText(this, getString(R.string.internet_error), Toast.LENGTH_SHORT)
+                    .show();
+
+        }
+    }
+
+    private void getSchedules() {
+
+        apiStatus = GET_DUTY_API;
+        String url = Constants.baseUrl + String.format(Constants.responderScheduleEndPoint, AppPreferencesHandler.getUserId(this));
+        Log.d("url", url);
+        JSONObject payload = new JSONObject();
+
+        Log.d("payload", payload.toString());
+        if (HelperMethods.isNetWorkAvailable(this)) {
+
+            UTF8StringRequest request = new UTF8StringRequest(Request.Method.GET, url, responseListener, errorListener)
+            {
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+
+                    Map<String, String> header = new HashMap<>();
+                    header.put("Content-Type",
+                            "application/json");
+                    header.put("Authorization",  AppPreferencesHandler.getUserToken(ActivateDutyActivity.this));
+
+                    return header;
+                }
+            };
+
+            RetryPolicy retryPolicy = new DefaultRetryPolicy(
+                    AppController.VOLLEY_TIMEOUT,
+                    AppController.VOLLEY_MAX_RETRIES,
+                    AppController.VOLLEY_BACKUP_MULT);
+            request.setRetryPolicy(retryPolicy);
+            AppController.getInstance().addToRequestQueue(request);
+
+        } else {
+            Toast.makeText(this, getString(R.string.internet_error), Toast.LENGTH_SHORT)
+                    .show();
+
         }
     }
 

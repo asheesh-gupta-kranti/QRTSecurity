@@ -244,6 +244,7 @@ public class CompleteProfileActivity extends AppCompatActivity implements View.O
                     progressBar.setVisibility(View.GONE);
                     Toast.makeText(CompleteProfileActivity.this, getString(R.string.profile_update_success), Toast.LENGTH_SHORT)
                             .show();
+                    openHomeActivity();
                 }
             }, new Response.ErrorListener() {
                 @Override
