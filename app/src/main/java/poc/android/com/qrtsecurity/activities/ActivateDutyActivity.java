@@ -385,6 +385,7 @@ public class ActivateDutyActivity extends AppCompatActivity implements Navigatio
         @Override
         public void onErrorResponse(VolleyError error) {
             Log.e("error", ""+error.getLocalizedMessage());
+            Toast.makeText(ActivateDutyActivity.this, getString(R.string.general_error), Toast.LENGTH_SHORT).show();
         }
     };
 

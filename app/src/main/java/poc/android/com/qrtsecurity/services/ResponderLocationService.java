@@ -18,7 +18,25 @@ import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.RetryPolicy;
+import com.android.volley.VolleyError;
+
+import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import poc.android.com.qrtsecurity.AppController;
 import poc.android.com.qrtsecurity.R;
+import poc.android.com.qrtsecurity.activities.ActivateDutyActivity;
+import poc.android.com.qrtsecurity.utils.AppPreferencesHandler;
+import poc.android.com.qrtsecurity.utils.Constants;
+import poc.android.com.qrtsecurity.utils.HelperMethods;
+import poc.android.com.qrtsecurity.volleyWrapperClasses.UTF8StringRequest;
 
 import static android.app.NotificationManager.IMPORTANCE_HIGH;
 
@@ -43,6 +61,7 @@ public class ResponderLocationService extends Service {
             Log.e(TAG, "onLocationChanged: " + location);
             Toast.makeText(ResponderLocationService.this, "Location:" + location.getLatitude() + "," + location.getLongitude(), Toast.LENGTH_SHORT).show();
             mLastLocation.set(location);
+            postLocation(location.getLatitude(), location.getLongitude());
         }
 
         @Override
@@ -199,6 +218,64 @@ public class ResponderLocationService extends Service {
         Log.e(TAG, "initializeLocationManager - LOCATION_INTERVAL: " + LOCATION_INTERVAL + " LOCATION_DISTANCE: " + LOCATION_DISTANCE);
         if (mLocationManager == null) {
             mLocationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
+        }
+    }
+
+    private void postLocation(double lat, double lng) {
+
+
+        String url = Constants.baseUrl + String.format(Constants.responderLocationEndPoint, AppPreferencesHandler.getScheduleId(this));
+        Log.d("url", url);
+        JSONObject payload = new JSONObject();
+        try {
+            JSONObject location = new JSONObject();
+            location.put("lat", lat);
+            location.put("lng", lng);
+            payload.put("location", location);
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
+
+        Log.d("payload", payload.toString());
+        if (HelperMethods.isNetWorkAvailable(this)) {
+
+            UTF8StringRequest request = new UTF8StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+
+                    Toast.makeText(ResponderLocationService.this, "Location update successful", Toast.LENGTH_SHORT).show();
+
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Toast.makeText(ResponderLocationService.this, getString(R.string.general_error), Toast.LENGTH_SHORT).show();
+                }
+            })
+            {
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+
+                    Map<String, String> header = new HashMap<>();
+                    header.put("Content-Type",
+                            "application/json");
+                    header.put("Authorization",  AppPreferencesHandler.getUserToken(ResponderLocationService.this));
+
+                    return header;
+                }
+            };
+
+            RetryPolicy retryPolicy = new DefaultRetryPolicy(
+                    AppController.VOLLEY_TIMEOUT,
+                    AppController.VOLLEY_MAX_RETRIES,
+                    AppController.VOLLEY_BACKUP_MULT);
+            request.setRetryPolicy(retryPolicy);
+            AppController.getInstance().addToRequestQueue(request);
+
+        } else {
+            Toast.makeText(this, getString(R.string.internet_error), Toast.LENGTH_SHORT)
+                    .show();
+
         }
     }
 }
