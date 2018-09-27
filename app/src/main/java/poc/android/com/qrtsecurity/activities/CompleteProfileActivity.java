@@ -9,6 +9,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AlertDialog;
@@ -16,6 +17,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.DatePicker;
@@ -29,13 +32,18 @@ import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.RetryPolicy;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.Volley;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,6 +54,7 @@ import poc.android.com.qrtsecurity.utils.AppPreferencesHandler;
 import poc.android.com.qrtsecurity.utils.Constants;
 import poc.android.com.qrtsecurity.utils.HelperMethods;
 import poc.android.com.qrtsecurity.volleyWrapperClasses.UTF8JsonObjectRequest;
+import poc.android.com.qrtsecurity.volleyWrapperClasses.VolleyMultipartRequest;
 
 public class CompleteProfileActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -59,6 +68,8 @@ public class CompleteProfileActivity extends AppCompatActivity implements View.O
     private ImageView ivUploaded, ivProfile;
     private RadioGroup rgGender;
     private ProgressBar progressBar;
+    private String licencePicName = "", profilePicName = "";
+    private boolean isProfileEdited = false;
 
     private int imageType = 0; //0: Licence 1: Profile
     private String gender = "MALE";
@@ -70,6 +81,18 @@ public class CompleteProfileActivity extends AppCompatActivity implements View.O
 
         setUI();
     }
+
+    @Override
+    public void onBackPressed() {
+//        super.onBackPressed();
+
+        if (isProfileEdited) {
+            showExistConfirmationDialog();
+        } else {
+            super.onBackPressed();
+        }
+    }
+
 
     /**
      * method to set the ui elements
@@ -130,10 +153,10 @@ public class CompleteProfileActivity extends AppCompatActivity implements View.O
     /**
      * method to set the save user profile data
      */
-    private void setSavedUserValue(){
+    private void setSavedUserValue() {
         ResponderModel user = AppPreferencesHandler.getUserDetails(this);
 
-        if (!user.getResponderName().isEmpty()){
+        if (!user.getResponderName().isEmpty()) {
 
             etName.setText(user.getResponderName());
             etDOB.setText(user.getDob());
@@ -141,10 +164,10 @@ public class CompleteProfileActivity extends AppCompatActivity implements View.O
             etVehicleModel.setText("");
             etVehicleRegNo.setText(user.getVehicleRegNo());
 
-            if (user.getGender().equalsIgnoreCase("female")){
+            if (user.getGender().equalsIgnoreCase("female")) {
                 RadioButton rbFemale = findViewById(R.id.rb_female);
                 rbFemale.setChecked(true);
-            }else{
+            } else {
                 RadioButton rbMale = findViewById(R.id.rb_male);
                 rbMale.setChecked(true);
             }
@@ -230,6 +253,14 @@ public class CompleteProfileActivity extends AppCompatActivity implements View.O
             payload.put("vehicleRegNo", vehicleRegNo);
             payload.put("licenceNo", drivingLicence);
             payload.put("gender", gender);
+
+            if (licencePicName != null && !licencePicName.isEmpty()) {
+                payload.put("licencePic", licencePicName);
+            }
+
+            if (profilePicName != null && !profilePicName.isEmpty()) {
+                payload.put("photo", profilePicName);
+            }
         } catch (Exception ex) {
             ex.printStackTrace();
             return;
@@ -345,18 +376,33 @@ public class CompleteProfileActivity extends AppCompatActivity implements View.O
         if (requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK) {
             Bitmap photo = (Bitmap) intent.getExtras().get("data");
 //            Uri selectedImage = intent.getData();
-            if (imageType == 0)
+            if (imageType == 0) {
                 ivUploaded.setImageBitmap(photo);
-            else
+                licencePicName = "lic_" + Calendar.getInstance().getTimeInMillis() + "_" + AppPreferencesHandler.getUserId(CompleteProfileActivity.this) + ".png";
+                uploadBitmap(photo, licencePicName);
+            } else {
                 ivProfile.setImageBitmap(photo);
+                profilePicName = "pro_" + Calendar.getInstance().getTimeInMillis() + "_" + AppPreferencesHandler.getUserId(CompleteProfileActivity.this) + ".png";
+                uploadBitmap(photo, profilePicName);
+            }
         } else if (requestCode == GALLERY_REQUEST && resultCode == Activity.RESULT_OK) {
 //            Uri selectedImage = intent.getData();
 //            ivUploaded.setImageURI(selectedImage);
-            Uri selectedImage = intent.getData();
-            if (imageType == 0)
-                ivUploaded.setImageURI(selectedImage);
-            else
-                ivProfile.setImageURI(selectedImage);
+            Uri imageUri = intent.getData();
+            try {
+                Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
+                if (imageType == 0) {
+                    ivUploaded.setImageBitmap(bitmap);
+                    licencePicName = "lic_" + Calendar.getInstance().getTimeInMillis() + "_" + AppPreferencesHandler.getUserId(CompleteProfileActivity.this) + ".png";
+                    uploadBitmap(bitmap, licencePicName);
+                } else {
+                    ivProfile.setImageBitmap(bitmap);
+                    profilePicName = "pro_" + Calendar.getInstance().getTimeInMillis() + "_" + AppPreferencesHandler.getUserId(CompleteProfileActivity.this) + ".png";
+                    uploadBitmap(bitmap, profilePicName);
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
         }
     }
 
@@ -380,9 +426,114 @@ public class CompleteProfileActivity extends AppCompatActivity implements View.O
     /**
      * Method to open the home activity after login
      */
-    private void openHomeActivity(){
+    private void openHomeActivity() {
         startActivity(new Intent(this, ActivateDutyActivity.class));
         finish();
+    }
+
+    private void uploadBitmap(final Bitmap bitmap, final String imageName) {
+
+        //getting the tag from the edittext
+        final String tags = "uploadBitmap";
+
+        //our custom volley request
+        VolleyMultipartRequest volleyMultipartRequest = new VolleyMultipartRequest(Request.Method.POST, Constants.baseUrl + Constants.uploadImageEndPoint,
+                new Response.Listener<NetworkResponse>() {
+                    @Override
+                    public void onResponse(NetworkResponse response) {
+                        try {
+                            isProfileEdited = true;
+                            JSONObject obj = new JSONObject(new String(response.data));
+                            Log.d(tags, new String(response.data));
+                            Toast.makeText(getApplicationContext(), "successfully upload", Toast.LENGTH_SHORT).show();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e(tags, error.getMessage());
+                        Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                }) {
+
+            /*
+            * If you want to add more parameters with the image
+            * you can do it here
+            * here we have only one parameter with the image
+            * which is tags
+            * */
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<>();
+                params.put("tags", tags);
+                return params;
+            }
+
+            /*
+            * Here we are passing image by renaming it with a unique name
+            * */
+            @Override
+            protected Map<String, DataPart> getByteData() {
+                Map<String, DataPart> params = new HashMap<>();
+
+                params.put("file", new DataPart(imageName, getFileDataFromDrawable(bitmap)));
+                return params;
+            }
+        };
+
+        //adding the request to volley
+        Volley.newRequestQueue(this).add(volleyMultipartRequest);
+    }
+
+    /*
+* The method is taking Bitmap as an argument
+* then it will return the byte[] array for the given bitmap
+* and we will send this array to the server
+* here we are using PNG Compression with 80% quality
+* you can give quality between 0 to 100
+* 0 means worse quality
+* 100 means best quality
+* */
+    public byte[] getFileDataFromDrawable(Bitmap bitmap) {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 80, byteArrayOutputStream);
+        return byteArrayOutputStream.toByteArray();
+    }
+
+    private void showExistConfirmationDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        builder.setCancelable(true);
+        builder.setTitle("Please save the changes before exist.");
+        builder.setNegativeButton("Exist", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                CompleteProfileActivity.this.finish();
+            }
+        });
+        builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                btnSubmit.performClick();
+            }
+        });
+
+        final AlertDialog alertDialog = builder.create();
+        try {
+            alertDialog.show();
+        } catch (Exception ignored) {
+        }
+
+        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+        Window window = alertDialog.getWindow();
+        lp.copyFrom(window.getAttributes());
+        lp.width = WindowManager.LayoutParams.MATCH_PARENT;
+        lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
+        window.setAttributes(lp);
     }
 }
 
