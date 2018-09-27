@@ -73,6 +73,7 @@ public class ActivateDutyActivity extends AppCompatActivity implements Navigatio
     private boolean isDutyOn = false;
     private Timer timer;
     final Handler handler = new Handler();
+    private boolean isAPIError = false;
 
 
     @Override
@@ -114,27 +115,7 @@ public class ActivateDutyActivity extends AppCompatActivity implements Navigatio
         btnEditProfile.setOnClickListener(this);
         btnDutySwitch.setOnClickListener(this);
 
-//        if (AppPreferencesHandler.getDutyState(this)) {
-//            startDuty();
-//        } else {
-//            stopDuty();
-//        }
-
     }
-
-//    private void pulseAnimation(){
-//        objAnim= ObjectAnimator.ofPropertyValuesHolder(btnDutySwitch, PropertyValuesHolder.ofFloat("scaleX", 1.5f), PropertyValuesHolder.ofFloat("scaleY", 1.5f));
-//        objAnim.setDuration(300);
-//        objAnim.setRepeatCount(ObjectAnimator.INFINITE);
-//        objAnim.setRepeatMode(ObjectAnimator.REVERSE);
-//        objAnim.start();
-//    }
-//
-////To Stop Animation, simply use cancel method of ObjectAnimator object as below.
-//
-//    private void stopPulseAnimation(){
-//        objAnim.cancel();
-//    }
 
 
     @Override
@@ -175,6 +156,8 @@ public class ActivateDutyActivity extends AppCompatActivity implements Navigatio
         switch (v.getId()) {
             case R.id.btn_edit_profile:
                 startActivity(new Intent(this, CompleteProfileActivity.class));
+                DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                drawer.closeDrawer(GravityCompat.START);
                 break;
 
             case R.id.btn_duty_switch:
@@ -243,8 +226,6 @@ public class ActivateDutyActivity extends AppCompatActivity implements Navigatio
         btnDutySwitch.setBackgroundResource(R.drawable.duty_on_bg);
         btnDutySwitch.setText(getString(R.string.duty_on));
         tvTimer.setText(getDutyTimer());
-//        pulseAnimation();
-//        Log.d("Duty","Start Timer");
         startTimer();
     }
 
@@ -366,15 +347,27 @@ public class ActivateDutyActivity extends AppCompatActivity implements Navigatio
                             AppPreferencesHandler.setScheduleId(getApplicationContext(), sId);
                             Toast.makeText(ActivateDutyActivity.this, "Schedule ID:"+ sId, Toast.LENGTH_SHORT).show();
                         }
+
+                        if(isAPIError){
+                            putSchedule();
+                        }
                     }catch (Exception ex){
                         ex.printStackTrace();
                     }
                     break;
                     
                 case PUT_DUTY_API:
-                    stopDuty();
-                    stopLocationService();
-                    Toast.makeText(ActivateDutyActivity.this, "Duty Stoped", Toast.LENGTH_SHORT).show();
+
+                    if(isAPIError){
+                        isAPIError = false;
+                        postSchedule();
+                    }else {
+                        stopDuty();
+                        stopLocationService();
+                        Toast.makeText(ActivateDutyActivity.this, "Duty Stoped", Toast.LENGTH_SHORT).show();
+                    }
+
+
                     break;
             }
 
@@ -385,7 +378,17 @@ public class ActivateDutyActivity extends AppCompatActivity implements Navigatio
         @Override
         public void onErrorResponse(VolleyError error) {
             Log.e("error", ""+error.getLocalizedMessage());
-            Toast.makeText(ActivateDutyActivity.this, getString(R.string.general_error), Toast.LENGTH_SHORT).show();
+
+            switch (apiStatus) {
+                case POST_DUTY_API:
+                    getSchedules();
+                    isAPIError = true;
+                    break;
+                default:
+                    Toast.makeText(ActivateDutyActivity.this, getString(R.string.general_error), Toast.LENGTH_SHORT).show();
+                    break;
+            }
+
         }
     };
 
