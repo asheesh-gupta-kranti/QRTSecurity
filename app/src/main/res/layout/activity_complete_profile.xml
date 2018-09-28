@@ -44,7 +44,7 @@
                         android:layout_marginTop="10dp"
                         android:layout_gravity="center_horizontal">
 
-                        <ImageView
+                        <com.android.volley.toolbox.NetworkImageView
                             android:id="@+id/iv_profile"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
@@ -202,7 +202,7 @@
                             android:text="@string/upload_photo"
                             android:theme="@style/PrimaryButton" />
 
-                        <ImageView
+                        <com.android.volley.toolbox.NetworkImageView
                             android:id="@+id/iv_uploaded"
                             android:layout_width="80dp"
                             android:layout_height="80dp"

@@ -13,6 +13,24 @@ public class ResponderModel {
     private String vehicleRegNo;
     private String licenceNo;
     private String gender;
+    private String photo;
+    private String licencePic;
+
+    public String getPhoto() {
+        return photo;
+    }
+
+    public void setPhoto(String photo) {
+        this.photo = photo;
+    }
+
+    public String getLicencePic() {
+        return licencePic;
+    }
+
+    public void setLicencePic(String licencePic) {
+        this.licencePic = licencePic;
+    }
 
     public int getResponderId() {
         return responderId;

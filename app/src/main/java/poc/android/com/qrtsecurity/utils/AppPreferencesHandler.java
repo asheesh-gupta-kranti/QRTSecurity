@@ -114,6 +114,8 @@ public class AppPreferencesHandler {
         editor.putString(Constants.vehicleRegNo, user.getVehicleRegNo());
         editor.putString(Constants.licenceNo, user.getLicenceNo());
         editor.putString(Constants.gender, user.getGender());
+        editor.putString(Constants.profilePic, user.getPhoto());
+        editor.putString(Constants.licencePic, user.getLicencePic());
 
         editor.apply();
 
@@ -129,7 +131,8 @@ public class AppPreferencesHandler {
         user.setVehicleRegNo(prefs.getString(Constants.vehicleRegNo, ""));
         user.setLicenceNo(prefs.getString(Constants.licenceNo, ""));
         user.setGender(prefs.getString(Constants.gender, "MALE"));
-
+        user.setPhoto(prefs.getString(Constants.profilePic, ""));
+        user.setLicencePic(prefs.getString(Constants.licencePic, ""));
         return user;
     }
 
@@ -146,5 +149,11 @@ public class AppPreferencesHandler {
     public static int getScheduleId(Context context) {
         SharedPreferences prefs = context.getSharedPreferences(Constants.parentPreferenceKey, Context.MODE_PRIVATE);
         return prefs.getInt(Constants.scheduleId, -1);
+    }
+
+    public static void clearData(Context context){
+        SharedPreferences pref = context.getSharedPreferences(Constants.parentPreferenceKey,
+                Context.MODE_PRIVATE);
+        pref.edit().clear().commit();
     }
 }

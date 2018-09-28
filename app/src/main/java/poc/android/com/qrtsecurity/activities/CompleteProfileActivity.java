@@ -37,7 +37,10 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.RetryPolicy;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.ImageLoader;
+import com.android.volley.toolbox.NetworkImageView;
 import com.android.volley.toolbox.Volley;
+import com.google.gson.Gson;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -50,9 +53,11 @@ import java.util.Map;
 import poc.android.com.qrtsecurity.AppController;
 import poc.android.com.qrtsecurity.Models.ResponderModel;
 import poc.android.com.qrtsecurity.R;
+import poc.android.com.qrtsecurity.fragments.EnterPasswordFragment;
 import poc.android.com.qrtsecurity.utils.AppPreferencesHandler;
 import poc.android.com.qrtsecurity.utils.Constants;
 import poc.android.com.qrtsecurity.utils.HelperMethods;
+import poc.android.com.qrtsecurity.utils.VolleySingleton;
 import poc.android.com.qrtsecurity.volleyWrapperClasses.UTF8JsonObjectRequest;
 import poc.android.com.qrtsecurity.volleyWrapperClasses.VolleyMultipartRequest;
 
@@ -65,11 +70,12 @@ public class CompleteProfileActivity extends AppCompatActivity implements View.O
     private TextInputLayout tilName, tilVehicleModel, tilVehicleRegNo, tilDrivingNo, tilDOB;
     private Button btnUpload, btnSubmit;
     private ImageButton btnProfile;
-    private ImageView ivUploaded, ivProfile;
+    private NetworkImageView ivUploaded, ivProfile;
     private RadioGroup rgGender;
     private ProgressBar progressBar;
     private String licencePicName = "", profilePicName = "";
     private boolean isProfileEdited = false;
+    private ImageLoader mImageLoader;
 
     private int imageType = 0; //0: Licence 1: Profile
     private String gender = "MALE";
@@ -147,6 +153,10 @@ public class CompleteProfileActivity extends AppCompatActivity implements View.O
             }
         });
 
+        mImageLoader = VolleySingleton.getInstance().getImageLoader();
+        ivProfile.setDefaultImageResId(R.drawable.default_profile);
+        ivUploaded.setDefaultImageResId(R.drawable.default_image);
+
         setSavedUserValue();
     }
 
@@ -170,6 +180,15 @@ public class CompleteProfileActivity extends AppCompatActivity implements View.O
             } else {
                 RadioButton rbMale = findViewById(R.id.rb_male);
                 rbMale.setChecked(true);
+            }
+
+
+            if (user.getPhoto() != null && !user.getPhoto().isEmpty()){
+                ivProfile.setImageUrl(Constants.imageBaseUrl+user.getPhoto(), mImageLoader);
+            }
+
+            if (user.getLicencePic() != null && !user.getLicencePic().isEmpty()){
+                ivUploaded.setImageUrl(Constants.imageBaseUrl+user.getLicencePic(), mImageLoader);
             }
         }
     }
@@ -271,7 +290,14 @@ public class CompleteProfileActivity extends AppCompatActivity implements View.O
             UTF8JsonObjectRequest request = new UTF8JsonObjectRequest(Request.Method.POST, url, payload, new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
-                    Log.d("registerUser response", response.toString());
+                    Log.d("update profile response", response.toString());
+                    try{
+                        JSONObject json = response.getJSONObject("responderData");
+                        ResponderModel user = new Gson().fromJson(json.toString(), ResponderModel.class);
+                        AppPreferencesHandler.saveUserDetails(CompleteProfileActivity.this, user);
+                    }catch (Exception ex){
+                        ex.printStackTrace();
+                    }
                     progressBar.setVisibility(View.GONE);
                     Toast.makeText(CompleteProfileActivity.this, getString(R.string.profile_update_success), Toast.LENGTH_SHORT)
                             .show();
@@ -435,7 +461,7 @@ public class CompleteProfileActivity extends AppCompatActivity implements View.O
 
         //getting the tag from the edittext
         final String tags = "uploadBitmap";
-
+        progressBar.setVisibility(View.VISIBLE);
         //our custom volley request
         VolleyMultipartRequest volleyMultipartRequest = new VolleyMultipartRequest(Request.Method.POST, Constants.baseUrl + Constants.uploadImageEndPoint,
                 new Response.Listener<NetworkResponse>() {
@@ -449,6 +475,8 @@ public class CompleteProfileActivity extends AppCompatActivity implements View.O
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
+
+                        progressBar.setVisibility(View.GONE);
                     }
                 },
                 new Response.ErrorListener() {
@@ -456,6 +484,7 @@ public class CompleteProfileActivity extends AppCompatActivity implements View.O
                     public void onErrorResponse(VolleyError error) {
                         Log.e(tags, error.getMessage());
                         Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
+                        progressBar.setVisibility(View.GONE);
                     }
                 }) {
 

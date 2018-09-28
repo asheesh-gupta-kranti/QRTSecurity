@@ -27,6 +27,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,6 +37,8 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.RetryPolicy;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.ImageLoader;
+import com.android.volley.toolbox.NetworkImageView;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -53,6 +56,7 @@ import poc.android.com.qrtsecurity.services.ResponderLocationService;
 import poc.android.com.qrtsecurity.utils.AppPreferencesHandler;
 import poc.android.com.qrtsecurity.utils.Constants;
 import poc.android.com.qrtsecurity.utils.HelperMethods;
+import poc.android.com.qrtsecurity.utils.VolleySingleton;
 import poc.android.com.qrtsecurity.volleyWrapperClasses.UTF8JsonObjectRequest;
 import poc.android.com.qrtsecurity.volleyWrapperClasses.UTF8StringRequest;
 
@@ -65,6 +69,7 @@ public class ActivateDutyActivity extends AppCompatActivity implements Navigatio
     private static final int GET_DUTY_API = 103;
 
     private ImageButton btnEditProfile;
+    private NetworkImageView ivProfile;
     private Button btnDutySwitch;
     private TextView tvTimer, tvName, tvModel;
     ObjectAnimator objAnim;
@@ -73,6 +78,8 @@ public class ActivateDutyActivity extends AppCompatActivity implements Navigatio
     private boolean isDutyOn = false;
     private Timer timer;
     final Handler handler = new Handler();
+    private boolean isAPIError = false;
+    private ImageLoader mImageLoader;
 
 
     @Override
@@ -106,35 +113,25 @@ public class ActivateDutyActivity extends AppCompatActivity implements Navigatio
         btnEditProfile = headerView.findViewById(R.id.btn_edit_profile);
         tvName = headerView.findViewById(R.id.tv_name);
         tvModel = headerView.findViewById(R.id.tv_model);
+        ivProfile = headerView.findViewById(R.id.iv_profile);
 
+        btnEditProfile.setOnClickListener(this);
+        btnDutySwitch.setOnClickListener(this);
+        mImageLoader = VolleySingleton.getInstance().getImageLoader();
+        ivProfile.setDefaultImageResId(R.drawable.default_profile);
+
+        updateUser();
+    }
+
+    private void updateUser(){
         ResponderModel user = AppPreferencesHandler.getUserDetails(this);
         tvName.setText(user.getResponderName());
         tvModel.setText(user.getVehicleRegNo());
 
-        btnEditProfile.setOnClickListener(this);
-        btnDutySwitch.setOnClickListener(this);
-
-//        if (AppPreferencesHandler.getDutyState(this)) {
-//            startDuty();
-//        } else {
-//            stopDuty();
-//        }
-
+        if (user.getPhoto() != null && !user.getPhoto().isEmpty()){
+            ivProfile.setImageUrl(Constants.imageBaseUrl+user.getPhoto(), mImageLoader);
+        }
     }
-
-//    private void pulseAnimation(){
-//        objAnim= ObjectAnimator.ofPropertyValuesHolder(btnDutySwitch, PropertyValuesHolder.ofFloat("scaleX", 1.5f), PropertyValuesHolder.ofFloat("scaleY", 1.5f));
-//        objAnim.setDuration(300);
-//        objAnim.setRepeatCount(ObjectAnimator.INFINITE);
-//        objAnim.setRepeatMode(ObjectAnimator.REVERSE);
-//        objAnim.start();
-//    }
-//
-////To Stop Animation, simply use cancel method of ObjectAnimator object as below.
-//
-//    private void stopPulseAnimation(){
-//        objAnim.cancel();
-//    }
 
 
     @Override
@@ -160,7 +157,7 @@ public class ActivateDutyActivity extends AppCompatActivity implements Navigatio
         } else if (id == R.id.nav_help) {
 
         } else if (id == R.id.nav_logout) {
-            AppPreferencesHandler.setLoginStatus(this, false);
+            AppPreferencesHandler.clearData(this);
             startActivity(new Intent(this, MainActivity.class));
             finish();
         }
@@ -175,6 +172,8 @@ public class ActivateDutyActivity extends AppCompatActivity implements Navigatio
         switch (v.getId()) {
             case R.id.btn_edit_profile:
                 startActivity(new Intent(this, CompleteProfileActivity.class));
+                DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                drawer.closeDrawer(GravityCompat.START);
                 break;
 
             case R.id.btn_duty_switch:
@@ -243,8 +242,6 @@ public class ActivateDutyActivity extends AppCompatActivity implements Navigatio
         btnDutySwitch.setBackgroundResource(R.drawable.duty_on_bg);
         btnDutySwitch.setText(getString(R.string.duty_on));
         tvTimer.setText(getDutyTimer());
-//        pulseAnimation();
-//        Log.d("Duty","Start Timer");
         startTimer();
     }
 
@@ -260,6 +257,8 @@ public class ActivateDutyActivity extends AppCompatActivity implements Navigatio
     @Override
     protected void onStart() {
         super.onStart();
+
+        updateUser();
 
         if (AppPreferencesHandler.getDutyState(this)){
             startDuty();
@@ -366,15 +365,27 @@ public class ActivateDutyActivity extends AppCompatActivity implements Navigatio
                             AppPreferencesHandler.setScheduleId(getApplicationContext(), sId);
                             Toast.makeText(ActivateDutyActivity.this, "Schedule ID:"+ sId, Toast.LENGTH_SHORT).show();
                         }
+
+                        if(isAPIError){
+                            putSchedule();
+                        }
                     }catch (Exception ex){
                         ex.printStackTrace();
                     }
                     break;
                     
                 case PUT_DUTY_API:
-                    stopDuty();
-                    stopLocationService();
-                    Toast.makeText(ActivateDutyActivity.this, "Duty Stoped", Toast.LENGTH_SHORT).show();
+
+                    if(isAPIError){
+                        isAPIError = false;
+                        postSchedule();
+                    }else {
+                        stopDuty();
+                        stopLocationService();
+                        Toast.makeText(ActivateDutyActivity.this, "Duty Stoped", Toast.LENGTH_SHORT).show();
+                    }
+
+
                     break;
             }
 
@@ -385,7 +396,17 @@ public class ActivateDutyActivity extends AppCompatActivity implements Navigatio
         @Override
         public void onErrorResponse(VolleyError error) {
             Log.e("error", ""+error.getLocalizedMessage());
-            Toast.makeText(ActivateDutyActivity.this, getString(R.string.general_error), Toast.LENGTH_SHORT).show();
+
+            switch (apiStatus) {
+                case POST_DUTY_API:
+                    getSchedules();
+                    isAPIError = true;
+                    break;
+                default:
+                    Toast.makeText(ActivateDutyActivity.this, getString(R.string.general_error), Toast.LENGTH_SHORT).show();
+                    break;
+            }
+
         }
     };
 

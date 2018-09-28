@@ -32,4 +32,6 @@ public class Constants {
     public static final String dutyStartTime = "dutyStartTime";
     public static final String dutyState = "dutyState";
     public static final String scheduleId = "scheduleId";
+    public static final String profilePic = "profilePic";
+    public static final String licencePic = "licencePic";
 ;}
