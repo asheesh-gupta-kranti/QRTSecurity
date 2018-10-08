@@ -150,9 +150,13 @@ public class ActivateDutyActivity extends AppCompatActivity implements Navigatio
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_history) {
+        if (id == R.id.mav_map) {
 
-        } else if (id == R.id.nav_contacts) {
+            startActivity(new Intent(this, MapActivity.class));
+
+        }  else if (id == R.id.nav_history) {
+
+        }else if (id == R.id.nav_contacts) {
 
         } else if (id == R.id.nav_help) {
 

@@ -242,13 +242,14 @@ public class ResponderLocationService extends Service {
             UTF8StringRequest request = new UTF8StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
-
+                    Log.d("location update", ""+response);
                     Toast.makeText(ResponderLocationService.this, "Location update successful", Toast.LENGTH_SHORT).show();
 
                 }
             }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
+                    Log.d("location update error", ""+error.getLocalizedMessage());
                     Toast.makeText(ResponderLocationService.this, getString(R.string.general_error), Toast.LENGTH_SHORT).show();
                 }
             })
