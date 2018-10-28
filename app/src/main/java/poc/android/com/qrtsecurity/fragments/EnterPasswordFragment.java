@@ -38,6 +38,7 @@ import poc.android.com.qrtsecurity.activities.HomeActivity;
 import poc.android.com.qrtsecurity.utils.AppPreferencesHandler;
 import poc.android.com.qrtsecurity.utils.Constants;
 import poc.android.com.qrtsecurity.utils.HelperMethods;
+import poc.android.com.qrtsecurity.utils.WebServices;
 import poc.android.com.qrtsecurity.volleyWrapperClasses.UTF8JsonObjectRequest;
 import poc.android.com.qrtsecurity.volleyWrapperClasses.UTF8StringRequest;
 
@@ -128,6 +129,11 @@ public class EnterPasswordFragment extends Fragment implements View.OnClickListe
                         AppPreferencesHandler.setUserId(getActivity(), userId);
                         AppPreferencesHandler.setLoginStatus(getActivity(), true);
                         getUserDetails(userId);
+
+                        if (!AppPreferencesHandler.getFCMId(EnterPasswordFragment.this.getContext()).isEmpty()){
+                            WebServices.postFCMId(EnterPasswordFragment.this.getContext());
+                        }
+
                     } catch (Exception ex) {
                         ex.printStackTrace();
                         Toast.makeText(getActivity(), getString(R.string.general_error), Toast.LENGTH_SHORT)

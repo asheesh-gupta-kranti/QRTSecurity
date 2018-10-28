@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "1088050816627",
+    "firebase_url": "https://saferqrt.firebaseio.com",
+    "project_id": "saferqrt",
+    "storage_bucket": "saferqrt.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1088050816627:android:3e44a53580b96b46",
+        "android_client_info": {
+          "package_name": "poc.android.com.qrtsecurity"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1088050816627-uqq8vhto3gpicgnecsnbf43edol4g0us.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDXja7oF_X5HmBb3sawe0zQAyb-M-4GqQ4"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -156,4 +156,17 @@ public class AppPreferencesHandler {
                 Context.MODE_PRIVATE);
         pref.edit().clear().commit();
     }
+
+    public static void setFCMId(Context context, String fcmId){
+        SharedPreferences pref = context.getSharedPreferences(Constants.parentPreferenceKey,
+                Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = pref.edit();
+        editor.putString(Constants.fcmId, fcmId);
+        editor.apply();
+    }
+
+    public static String getFCMId(Context context) {
+        SharedPreferences prefs = context.getSharedPreferences(Constants.parentPreferenceKey, Context.MODE_PRIVATE);
+        return prefs.getString(Constants.fcmId, "");
+    }
 }

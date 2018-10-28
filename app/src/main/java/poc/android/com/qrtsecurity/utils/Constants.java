@@ -17,6 +17,7 @@ public class Constants {
     public static final String responderScheduleEndPoint = "/api/responders/%d/schedules";
     public static final String responderLocationEndPoint = "/api/schedules/%d/resloc";
     public static final String uploadImageEndPoint = "/api/containers/safer-qrt/upload";
+    public static final String fcmRegisterEndPoint = "/api//installations";
 
     // Preferences keys
     public static final String parentPreferenceKey = "USER_PREFERENCES";
@@ -34,4 +35,5 @@ public class Constants {
     public static final String scheduleId = "scheduleId";
     public static final String profilePic = "profilePic";
     public static final String licencePic = "licencePic";
+    public static final String fcmId = "fcmId";
 ;}

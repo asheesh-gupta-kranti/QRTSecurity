@@ -12,6 +12,7 @@ import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -348,7 +349,8 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
 
                     lineOptions.addAll(points);
                     lineOptions.width(12);
-                    lineOptions.color(Color.RED);
+                    int color = ContextCompat.getColor(MapActivity.this, R.color.route_color);
+                    lineOptions.color(color);
                     lineOptions.geodesic(true);
 
                 }
@@ -371,8 +373,10 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
             String sensor = "sensor=false";
             String mode = "mode=driving";
 
+            String key = "key=" + getString(R.string.google_maps_key);
+
             // Building the parameters to the web service
-            String parameters = str_origin + "&" + str_dest + "&" + sensor + "&" + mode;
+            String parameters = str_origin + "&" + str_dest + "&" + sensor + "&" + mode + "&"+ key;
 
             // Output format
             String output = "json";
