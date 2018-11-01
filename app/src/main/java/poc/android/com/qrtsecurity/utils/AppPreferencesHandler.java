@@ -2,6 +2,9 @@ package poc.android.com.qrtsecurity.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.location.Location;
+
+import com.google.android.gms.maps.model.LatLng;
 
 import java.util.Calendar;
 
@@ -168,5 +171,28 @@ public class AppPreferencesHandler {
     public static String getFCMId(Context context) {
         SharedPreferences prefs = context.getSharedPreferences(Constants.parentPreferenceKey, Context.MODE_PRIVATE);
         return prefs.getString(Constants.fcmId, "");
+    }
+
+    /**
+     * Method to save the user current location to user preference
+     * @param location
+     */
+    public static void setUserLocation(Context context, Location location){
+        SharedPreferences prefs = context.getSharedPreferences(Constants.parentPreferenceKey, Context.MODE_PRIVATE);
+        prefs.edit().putFloat(Constants.lat, (float) location.getLatitude()).commit();
+        prefs.edit().putFloat(Constants.lng, (float) location.getLongitude()).commit();
+
+
+    }
+
+    /**
+     * method to get the user current location from user preferences
+     * @return
+     */
+    public static LatLng getUserLocation(Context context){
+        SharedPreferences prefs = context.getSharedPreferences(Constants.parentPreferenceKey, Context.MODE_PRIVATE);
+        LatLng latLng = new LatLng(prefs.getFloat(Constants.lat, 0), prefs.getFloat(Constants.lng, 0));
+
+        return latLng;
     }
 }

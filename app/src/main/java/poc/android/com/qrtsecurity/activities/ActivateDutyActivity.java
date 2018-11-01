@@ -3,6 +3,7 @@ package poc.android.com.qrtsecurity.activities;
 import android.Manifest;
 import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -25,6 +26,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -39,6 +41,7 @@ import com.android.volley.RetryPolicy;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
+import com.google.gson.Gson;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -50,8 +53,11 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import poc.android.com.qrtsecurity.AppController;
+import poc.android.com.qrtsecurity.CustomDialog.TripInfoCustomDialog;
+import poc.android.com.qrtsecurity.Models.NotificationModel;
 import poc.android.com.qrtsecurity.Models.ResponderModel;
 import poc.android.com.qrtsecurity.R;
+import poc.android.com.qrtsecurity.services.MyFirebaseMessagingService;
 import poc.android.com.qrtsecurity.services.ResponderLocationService;
 import poc.android.com.qrtsecurity.utils.AppPreferencesHandler;
 import poc.android.com.qrtsecurity.utils.Constants;
@@ -121,6 +127,31 @@ public class ActivateDutyActivity extends AppCompatActivity implements Navigatio
         ivProfile.setDefaultImageResId(R.drawable.default_profile);
 
         updateUser();
+
+        if (getIntent().getStringExtra(MyFirebaseMessagingService.dataKey) != null){
+            NotificationModel data = new Gson().fromJson(getIntent().getStringExtra(MyFirebaseMessagingService.dataKey), NotificationModel.class);
+            openTripInfoDialog(data);
+        }
+    }
+
+    private void openTripInfoDialog(NotificationModel data){
+        final TripInfoCustomDialog tripDialog = new TripInfoCustomDialog(this, data);
+        tripDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        tripDialog.setCancelable(false);
+        tripDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialogInterface) {
+
+                if (tripDialog.isAccepted){
+                    Intent mapIntent = new Intent(ActivateDutyActivity.this, MapActivity.class);
+                    mapIntent.putExtra(MyFirebaseMessagingService.dataKey, getIntent().getStringExtra(MyFirebaseMessagingService.dataKey));
+                    ActivateDutyActivity.this.startActivity(mapIntent);
+                }
+
+            }
+        });
+
+        tripDialog.show();
     }
 
     private void updateUser(){

@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -33,6 +34,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.gson.Gson;
 
 import org.json.JSONObject;
 
@@ -46,20 +48,21 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import poc.android.com.qrtsecurity.Models.NotificationModel;
 import poc.android.com.qrtsecurity.R;
+import poc.android.com.qrtsecurity.services.MyFirebaseMessagingService;
+import poc.android.com.qrtsecurity.utils.AppPreferencesHandler;
 import poc.android.com.qrtsecurity.utils.DirectionsJSONParser;
 
 public class MapActivity  extends AppCompatActivity implements OnMapReadyCallback
 {
-    public static final String EXTRA_LOCATION = "extra_location";
-
-    public static final int RESPONSE_OK = 101;
-    private static final int REQUEST_CHECK_SETTINGS = 401;
     private GoogleMap mMap;
     private LatLng myLocationLatLng;
     private FusedLocationProviderClient mFusedLocationClient;
     private GoogleApiClient googleApiClient;
     private boolean firstTimeRedirected = false;
+    LatLng origin, dest ;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,24 +76,32 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        if (getIntent().getStringExtra(MyFirebaseMessagingService.dataKey) != null){
+            NotificationModel data = new Gson().fromJson(getIntent().getStringExtra(MyFirebaseMessagingService.dataKey), NotificationModel.class);
+            origin = AppPreferencesHandler.getUserLocation(this);
+            dest = new LatLng(data.getTriggerdLocation().getLat(), data.getTriggerdLocation().getLng());
+
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(origin, 18));
+
+            mMap.addMarker(new MarkerOptions().position(origin).title("Origin"));
+            mMap.addMarker(new MarkerOptions().position(dest).title("Destination"));
+
+            String url = getDirectionsUrl(origin, dest);
+
+            DownloadTask downloadTask = new DownloadTask();
+
+            // Start downloading json data from Google Directions API
+            downloadTask.execute(url);
+        }else{
+            finish();
+        }
+
         findViewById(R.id.btn_direction).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // Getting URL to the Google Directions API
-
-                LatLng origin = new LatLng(28.632874, 77.215935);
-                LatLng dest = new LatLng(28.644917, 77.241723);
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(origin, 18));
-
-                mMap.addMarker(new MarkerOptions().position(origin).title("Origin"));
-                mMap.addMarker(new MarkerOptions().position(dest).title("Destination"));
-
-                String url = getDirectionsUrl(origin, dest);
-
-                DownloadTask downloadTask = new DownloadTask();
-
-                // Start downloading json data from Google Directions API
-                downloadTask.execute(url);
+                Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
+                        Uri.parse("http://maps.google.com/maps?saddr="+origin.latitude+","+origin.longitude+"&daddr="+dest.latitude+","+dest.longitude));
+                startActivity(intent);
             }
         });
 

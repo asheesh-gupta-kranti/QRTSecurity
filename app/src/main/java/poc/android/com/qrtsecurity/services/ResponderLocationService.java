@@ -27,6 +27,7 @@ import com.android.volley.VolleyError;
 
 import org.json.JSONObject;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,6 +37,7 @@ import poc.android.com.qrtsecurity.activities.ActivateDutyActivity;
 import poc.android.com.qrtsecurity.utils.AppPreferencesHandler;
 import poc.android.com.qrtsecurity.utils.Constants;
 import poc.android.com.qrtsecurity.utils.HelperMethods;
+import poc.android.com.qrtsecurity.volleyWrapperClasses.UTF8JsonObjectRequest;
 import poc.android.com.qrtsecurity.volleyWrapperClasses.UTF8StringRequest;
 
 import static android.app.NotificationManager.IMPORTANCE_HIGH;
@@ -61,6 +63,7 @@ public class ResponderLocationService extends Service {
             Log.e(TAG, "onLocationChanged: " + location);
             Toast.makeText(ResponderLocationService.this, "Location:" + location.getLatitude() + "," + location.getLongitude(), Toast.LENGTH_SHORT).show();
             mLastLocation.set(location);
+            AppPreferencesHandler.setUserLocation(ResponderLocationService.this, location);
             postLocation(location.getLatitude(), location.getLongitude());
         }
 
@@ -221,10 +224,68 @@ public class ResponderLocationService extends Service {
         }
     }
 
+//    private void postLocation(double lat, double lng) {
+//
+//
+//        String url = Constants.baseUrl + String.format(Constants.responderLocationEndPoint, AppPreferencesHandler.getScheduleId(this));
+//        Log.d("url", url);
+//        JSONObject payload = new JSONObject();
+//        try {
+//            JSONObject location = new JSONObject();
+//            location.put("lat", lat);
+//            location.put("lng", lng);
+//            payload.put("location", location);
+//        }catch (Exception ex){
+//            ex.printStackTrace();
+//        }
+//
+//        Log.d("payload", payload.toString());
+//        if (HelperMethods.isNetWorkAvailable(this)) {
+//
+//            UTF8StringRequest request = new UTF8StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+//                @Override
+//                public void onResponse(String response) {
+//                    Log.d("location update", ""+response);
+//                    Toast.makeText(ResponderLocationService.this, "Location update successful", Toast.LENGTH_SHORT).show();
+//
+//                }
+//            }, new Response.ErrorListener() {
+//                @Override
+//                public void onErrorResponse(VolleyError error) {
+//                    Log.d("location update error", ""+error.getLocalizedMessage());
+//                    Toast.makeText(ResponderLocationService.this, getString(R.string.general_error), Toast.LENGTH_SHORT).show();
+//                }
+//            })
+//            {
+//                @Override
+//                public Map<String, String> getHeaders() throws AuthFailureError {
+//
+//                    Map<String, String> header = new HashMap<>();
+//                    header.put("Content-Type",
+//                            "application/json");
+//                    header.put("Authorization",  AppPreferencesHandler.getUserToken(ResponderLocationService.this));
+//
+//                    return header;
+//                }
+//            };
+//
+//            RetryPolicy retryPolicy = new DefaultRetryPolicy(
+//                    AppController.VOLLEY_TIMEOUT,
+//                    AppController.VOLLEY_MAX_RETRIES,
+//                    AppController.VOLLEY_BACKUP_MULT);
+//            request.setRetryPolicy(retryPolicy);
+//            AppController.getInstance().addToRequestQueue(request);
+//
+//        } else {
+//            Toast.makeText(this, getString(R.string.internet_error), Toast.LENGTH_SHORT)
+//                    .show();
+//
+//        }
+//    }
+
     private void postLocation(double lat, double lng) {
 
-
-        String url = Constants.baseUrl + String.format(Constants.responderLocationEndPoint, AppPreferencesHandler.getScheduleId(this));
+        String url = Constants.baseUrl + String.format(Constants.responderLocationEndPoint, AppPreferencesHandler.getScheduleId(this)) + "?access_token=" + AppPreferencesHandler.getUserToken(this);
         Log.d("url", url);
         JSONObject payload = new JSONObject();
         try {
@@ -236,47 +297,41 @@ public class ResponderLocationService extends Service {
             ex.printStackTrace();
         }
 
+
         Log.d("payload", payload.toString());
-        if (HelperMethods.isNetWorkAvailable(this)) {
+        UTF8JsonObjectRequest request = new UTF8JsonObjectRequest(Request.Method.POST, url, payload, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                Log.d("Location response", response.toString());
 
-            UTF8StringRequest request = new UTF8StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
-                @Override
-                public void onResponse(String response) {
-                    Log.d("location update", ""+response);
-                    Toast.makeText(ResponderLocationService.this, "Location update successful", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ResponderLocationService.this, "Successful", Toast.LENGTH_SHORT).show();
 
-                }
-            }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    Log.d("location update error", ""+error.getLocalizedMessage());
-                    Toast.makeText(ResponderLocationService.this, getString(R.string.general_error), Toast.LENGTH_SHORT).show();
-                }
-            })
-            {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e("error", "" + error);
 
-                    Map<String, String> header = new HashMap<>();
-                    header.put("Content-Type",
-                            "application/json");
-                    header.put("Authorization",  AppPreferencesHandler.getUserToken(ResponderLocationService.this));
+                Toast.makeText(ResponderLocationService.this, "Something went wrong.", Toast.LENGTH_SHORT).show();
+            }
+        }) {
 
-                    return header;
-                }
-            };
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
 
-            RetryPolicy retryPolicy = new DefaultRetryPolicy(
-                    AppController.VOLLEY_TIMEOUT,
-                    AppController.VOLLEY_MAX_RETRIES,
-                    AppController.VOLLEY_BACKUP_MULT);
-            request.setRetryPolicy(retryPolicy);
-            AppController.getInstance().addToRequestQueue(request);
+                Map<String, String> header = new HashMap<>();
+                header.put("content-type",
+                        "application/json");
 
-        } else {
-            Toast.makeText(this, getString(R.string.internet_error), Toast.LENGTH_SHORT)
-                    .show();
+                return header;
+            }
+        };
 
-        }
+        RetryPolicy retryPolicy = new DefaultRetryPolicy(
+                AppController.VOLLEY_TIMEOUT,
+                AppController.VOLLEY_MAX_RETRIES,
+                AppController.VOLLEY_BACKUP_MULT);
+        request.setRetryPolicy(retryPolicy);
+        AppController.getInstance().addToRequestQueue(request);
     }
 }

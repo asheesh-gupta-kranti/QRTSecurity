@@ -18,6 +18,7 @@ public class Constants {
     public static final String responderLocationEndPoint = "/api/schedules/%d/resloc";
     public static final String uploadImageEndPoint = "/api/containers/safer-qrt/upload";
     public static final String fcmRegisterEndPoint = "/api//installations";
+    public static final String requestStatusUpdateEndPoint = "/api/qrtresponses/update";
 
     // Preferences keys
     public static final String parentPreferenceKey = "USER_PREFERENCES";
@@ -36,4 +37,7 @@ public class Constants {
     public static final String profilePic = "profilePic";
     public static final String licencePic = "licencePic";
     public static final String fcmId = "fcmId";
+    public static final String lat = "LATITUDE";
+    public static final String lng = "LONGITUDE";
+
 ;}

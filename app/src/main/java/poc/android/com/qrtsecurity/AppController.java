@@ -1,6 +1,11 @@
 package poc.android.com.qrtsecurity;
 
 import android.app.Application;
+import android.app.NotificationChannel;
+import android.app.NotificationChannelGroup;
+import android.app.NotificationManager;
+import android.content.Context;
+import android.os.Build;
 import android.text.TextUtils;
 
 import com.android.volley.Request;
@@ -27,6 +32,8 @@ public class AppController extends Application {
         super.onCreate();
 
         mInstance = this;
+
+        notificationChannels();
 
     }
 
@@ -82,4 +89,20 @@ public class AppController extends Application {
             mRequestQueue.cancelAll(TAG);
         }
     }
+
+    private void notificationChannels(){
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        if (notificationManager != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            int importance = NotificationManager.IMPORTANCE_LOW;
+            NotificationChannel notificationChannel = new NotificationChannel(CHANNEL_ID_QRT, CHANNEL_ID_QRT, importance);
+            notificationManager.createNotificationChannel(notificationChannel);
+
+
+
+            notificationManager.createNotificationChannelGroup(new NotificationChannelGroup("Background", "Background"));
+        }
+    }
+
+    public static final String CHANNEL_ID_QRT = "channel_id_qrt";
 }
