@@ -57,7 +57,7 @@ import poc.android.com.qrtsecurity.CustomDialog.TripInfoCustomDialog;
 import poc.android.com.qrtsecurity.Models.NotificationModel;
 import poc.android.com.qrtsecurity.Models.ResponderModel;
 import poc.android.com.qrtsecurity.R;
-import poc.android.com.qrtsecurity.services.MyFirebaseMessagingService;
+import poc.android.com.qrtsecurity.MyFirebaseMessagingService;
 import poc.android.com.qrtsecurity.services.ResponderLocationService;
 import poc.android.com.qrtsecurity.utils.AppPreferencesHandler;
 import poc.android.com.qrtsecurity.utils.Constants;
@@ -128,11 +128,15 @@ public class ActivateDutyActivity extends AppCompatActivity implements Navigatio
 
         updateUser();
 
-        if (getIntent().getStringExtra(MyFirebaseMessagingService.dataKey) != null){
-            NotificationModel data = new Gson().fromJson(getIntent().getStringExtra(MyFirebaseMessagingService.dataKey), NotificationModel.class);
-            openTripInfoDialog(data);
-        }
+
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+    }
+
 
     private void openTripInfoDialog(NotificationModel data){
         final TripInfoCustomDialog tripDialog = new TripInfoCustomDialog(this, data);
@@ -300,6 +304,22 @@ public class ActivateDutyActivity extends AppCompatActivity implements Navigatio
         }else{
             stopDuty();
         }
+
+
+
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                //Do something after 300ms
+                if (getIntent().getStringExtra(MyFirebaseMessagingService.dataKey) != null){
+                    NotificationModel data = new Gson().fromJson(getIntent().getStringExtra(MyFirebaseMessagingService.dataKey), NotificationModel.class);
+                    openTripInfoDialog(data);
+
+
+                }
+            }
+        }, 300);
     }
 
     @Override

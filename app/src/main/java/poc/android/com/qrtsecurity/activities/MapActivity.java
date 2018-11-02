@@ -50,7 +50,7 @@ import java.util.List;
 
 import poc.android.com.qrtsecurity.Models.NotificationModel;
 import poc.android.com.qrtsecurity.R;
-import poc.android.com.qrtsecurity.services.MyFirebaseMessagingService;
+import poc.android.com.qrtsecurity.MyFirebaseMessagingService;
 import poc.android.com.qrtsecurity.utils.AppPreferencesHandler;
 import poc.android.com.qrtsecurity.utils.DirectionsJSONParser;
 
@@ -79,7 +79,7 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
         if (getIntent().getStringExtra(MyFirebaseMessagingService.dataKey) != null){
             NotificationModel data = new Gson().fromJson(getIntent().getStringExtra(MyFirebaseMessagingService.dataKey), NotificationModel.class);
             origin = AppPreferencesHandler.getUserLocation(this);
-            dest = new LatLng(data.getTriggerdLocation().getLat(), data.getTriggerdLocation().getLng());
+            dest = new LatLng(data.getLat(), data.getLng());
 
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(origin, 18));
 

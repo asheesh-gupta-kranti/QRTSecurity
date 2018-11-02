@@ -18,6 +18,11 @@
         <item name="colorControlHighlight">@color/colorAccent</item>
         <item name="colorAccent">@color/colorPrimary</item>
     </style>
+    <style name="PrimaryFlatButtonNegative" parent="Theme.AppCompat.Light">
+        <item name="android:buttonStyle">@style/Widget.AppCompat.Button.Borderless.Colored</item>
+        <item name="colorControlHighlight">@color/colorAccent</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
 
     <style name="TextInputLayoutTheme" parent="Theme.AppCompat.Light">
         <item name="android:textColor">@color/primary_text</item>

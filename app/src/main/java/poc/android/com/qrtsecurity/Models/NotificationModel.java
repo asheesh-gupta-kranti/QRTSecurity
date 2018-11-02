@@ -11,7 +11,8 @@ public class NotificationModel {
     private String driverName;
     private String driverPhone;
     private String triggerStatus;
-    private LocationModel triggerdLocation;
+    private double lat;
+    private double lng;
 
     public String getTripId() {
         return tripId;
@@ -85,11 +86,19 @@ public class NotificationModel {
         this.triggerStatus = triggerStatus;
     }
 
-    public LocationModel getTriggerdLocation() {
-        return triggerdLocation;
+    public double getLat() {
+        return lat;
     }
 
-    public void setTriggerdLocation(LocationModel triggerdLocation) {
-        this.triggerdLocation = triggerdLocation;
+    public void setLat(double lat) {
+        this.lat = lat;
+    }
+
+    public double getLng() {
+        return lng;
+    }
+
+    public void setLng(double lng) {
+        this.lng = lng;
     }
 }
