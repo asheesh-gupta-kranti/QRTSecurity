@@ -79,7 +79,7 @@ public class TripInfoCustomDialog extends Dialog implements View.OnClickListener
     private void postStatus(String status) {
 
         String url = Constants.baseUrl + Constants.requestStatusUpdateEndPoint
-                +  "?filter={\"where\":{\"and\":[{\"tripId\":\""+data.getTripId()+"\"},{\"responderId\":"+AppPreferencesHandler.getScheduleId(getContext())+"}]}";
+                +  "?where={\"and\":[{\"tripId\":\""+data.getTripId()+"\"},{\"responderId\":"+AppPreferencesHandler.getScheduleId(getContext())+"}]}";
         Log.d("url", url);
         JSONObject payload = new JSONObject();
         try {
