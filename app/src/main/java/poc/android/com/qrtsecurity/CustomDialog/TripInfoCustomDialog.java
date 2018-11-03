@@ -17,6 +17,7 @@ import com.android.volley.Response;
 import com.android.volley.RetryPolicy;
 import com.android.volley.VolleyError;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.HashMap;
@@ -65,67 +66,82 @@ public class TripInfoCustomDialog extends Dialog implements View.OnClickListener
     public void onClick(View v) {
         progressBar.setVisibility(View.VISIBLE);
 
-        if (v == btnAccept){
+        if (v == btnAccept) {
             isAccepted = true;
             postStatus("ACCEPTED");
-        }else if (v == btnReject){
+        } else if (v == btnReject) {
             postStatus("CANCELLED");
         }
-
 
 
     }
 
     private void postStatus(String status) {
 
-        String url = Constants.baseUrl + Constants.requestStatusUpdateEndPoint
-                +  "?where={\"and\":[{\"tripId\":\""+data.getTripId()+"\"},{\"responderId\":"+AppPreferencesHandler.getScheduleId(getContext())+"}]}";
-        Log.d("url", url);
-        JSONObject payload = new JSONObject();
         try {
 
+            JSONObject params = new JSONObject();
+            JSONArray jsonArray = new JSONArray();
+            JSONObject obj1 = new JSONObject();
+            obj1.put("tripId", data.getTripId());
+
+            JSONObject obj2 = new JSONObject();
+            obj2.put("responderId", AppPreferencesHandler.getUserId(getContext()));
+
+            jsonArray.put(obj1);
+            jsonArray.put(obj2);
+
+            params.put("and", jsonArray);
+
+
+            String url = Constants.baseUrl + Constants.requestStatusUpdateEndPoint
+                    + "?where=" + params.toString();
+            Log.d("url", url);
+            JSONObject payload = new JSONObject();
+
+
             payload.put("responderStatus", status);
-        }catch (Exception ex){
+
+
+            Log.d("payload", payload.toString());
+            UTF8JsonObjectRequest request = new UTF8JsonObjectRequest(Request.Method.POST, url, payload, new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    Log.d("Location response", response.toString());
+
+                    Toast.makeText(getContext(), "Successful", Toast.LENGTH_SHORT).show();
+                    dismiss();
+                    progressBar.setVisibility(View.GONE);
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.e("error", "" + error);
+
+                    Toast.makeText(getContext(), "Something went wrong.", Toast.LENGTH_SHORT).show();
+                    progressBar.setVisibility(View.GONE);
+                }
+            }) {
+
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+
+                    Map<String, String> header = new HashMap<>();
+                    header.put("content-type",
+                            "application/json");
+
+                    return header;
+                }
+            };
+
+            RetryPolicy retryPolicy = new DefaultRetryPolicy(
+                    AppController.VOLLEY_TIMEOUT,
+                    AppController.VOLLEY_MAX_RETRIES,
+                    AppController.VOLLEY_BACKUP_MULT);
+            request.setRetryPolicy(retryPolicy);
+            AppController.getInstance().addToRequestQueue(request);
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
-
-
-        Log.d("payload", payload.toString());
-        UTF8JsonObjectRequest request = new UTF8JsonObjectRequest(Request.Method.POST, url, payload, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                Log.d("Location response", response.toString());
-
-                Toast.makeText(getContext(), "Successful", Toast.LENGTH_SHORT).show();
-                dismiss();
-                progressBar.setVisibility(View.GONE);
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.e("error", "" + error);
-
-                Toast.makeText(getContext(), "Something went wrong.", Toast.LENGTH_SHORT).show();
-                progressBar.setVisibility(View.GONE);
-            }
-        }) {
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-
-                Map<String, String> header = new HashMap<>();
-                header.put("content-type",
-                        "application/json");
-
-                return header;
-            }
-        };
-
-        RetryPolicy retryPolicy = new DefaultRetryPolicy(
-                AppController.VOLLEY_TIMEOUT,
-                AppController.VOLLEY_MAX_RETRIES,
-                AppController.VOLLEY_BACKUP_MULT);
-        request.setRetryPolicy(retryPolicy);
-        AppController.getInstance().addToRequestQueue(request);
     }
 }

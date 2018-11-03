@@ -18,7 +18,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.RetryPolicy;
+import com.android.volley.VolleyError;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -36,6 +43,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.gson.Gson;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -47,12 +55,16 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import poc.android.com.qrtsecurity.AppController;
 import poc.android.com.qrtsecurity.Models.NotificationModel;
 import poc.android.com.qrtsecurity.R;
 import poc.android.com.qrtsecurity.MyFirebaseMessagingService;
 import poc.android.com.qrtsecurity.utils.AppPreferencesHandler;
+import poc.android.com.qrtsecurity.utils.Constants;
 import poc.android.com.qrtsecurity.utils.DirectionsJSONParser;
+import poc.android.com.qrtsecurity.volleyWrapperClasses.UTF8JsonObjectRequest;
 
 public class MapActivity  extends AppCompatActivity implements OnMapReadyCallback
 {
@@ -62,6 +74,7 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
     private GoogleApiClient googleApiClient;
     private boolean firstTimeRedirected = false;
     LatLng origin, dest ;
+    private NotificationModel data;
 
 
     @Override
@@ -76,32 +89,24 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        if (getIntent().getStringExtra(MyFirebaseMessagingService.dataKey) != null){
-            NotificationModel data = new Gson().fromJson(getIntent().getStringExtra(MyFirebaseMessagingService.dataKey), NotificationModel.class);
-            origin = AppPreferencesHandler.getUserLocation(this);
-            dest = new LatLng(data.getLat(), data.getLng());
 
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(origin, 18));
-
-            mMap.addMarker(new MarkerOptions().position(origin).title("Origin"));
-            mMap.addMarker(new MarkerOptions().position(dest).title("Destination"));
-
-            String url = getDirectionsUrl(origin, dest);
-
-            DownloadTask downloadTask = new DownloadTask();
-
-            // Start downloading json data from Google Directions API
-            downloadTask.execute(url);
-        }else{
-            finish();
-        }
 
         findViewById(R.id.btn_direction).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
-                        Uri.parse("http://maps.google.com/maps?saddr="+origin.latitude+","+origin.longitude+"&daddr="+dest.latitude+","+dest.longitude));
-                startActivity(intent);
+
+                if (origin != null && dest != null) {
+                    Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
+                            Uri.parse("http://maps.google.com/maps?saddr=" + origin.latitude + "," + origin.longitude + "&daddr=" + dest.latitude + "," + dest.longitude));
+                    startActivity(intent);
+                }
+            }
+        });
+
+        findViewById(R.id.btn_complete_trip).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                postStatus("RESOLVED");
             }
         });
 
@@ -286,6 +291,26 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
         if (ActivityCompat.checkSelfPermission(MapActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(MapActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             mMap.setMyLocationEnabled(true);
         }
+
+        if (getIntent().getStringExtra(MyFirebaseMessagingService.dataKey) != null){
+            data = new Gson().fromJson(getIntent().getStringExtra(MyFirebaseMessagingService.dataKey), NotificationModel.class);
+            origin = AppPreferencesHandler.getUserLocation(this);
+            dest = new LatLng(data.getLat(), data.getLng());
+
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(origin, 18));
+
+            mMap.addMarker(new MarkerOptions().position(origin).title("Origin"));
+            mMap.addMarker(new MarkerOptions().position(dest).title("Destination"));
+
+            String url = getDirectionsUrl(origin, dest);
+
+            DownloadTask downloadTask = new DownloadTask();
+
+            // Start downloading json data from Google Directions API
+            downloadTask.execute(url);
+        }else{
+            finish();
+        }
     }
 
         private class DownloadTask extends AsyncTask<String,Void, String> {
@@ -433,4 +458,72 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
             }
             return data;
         }
+
+    private void postStatus(String status) {
+
+        try {
+
+            JSONObject params = new JSONObject();
+            JSONArray jsonArray = new JSONArray();
+            JSONObject obj1 = new JSONObject();
+            obj1.put("tripId", data.getTripId());
+
+            JSONObject obj2 = new JSONObject();
+            obj2.put("responderId", AppPreferencesHandler.getUserId(MapActivity.this));
+
+            jsonArray.put(obj1);
+            jsonArray.put(obj2);
+
+            params.put("and", jsonArray);
+
+
+            String url = Constants.baseUrl + Constants.requestStatusUpdateEndPoint
+                    + "?where=" + params.toString();
+            Log.d("url", url);
+            JSONObject payload = new JSONObject();
+
+
+            payload.put("responderStatus", status);
+
+
+            Log.d("payload", payload.toString());
+            UTF8JsonObjectRequest request = new UTF8JsonObjectRequest(Request.Method.POST, url, payload, new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    Log.d("Location response", response.toString());
+
+                    Toast.makeText(MapActivity.this, "Successful", Toast.LENGTH_SHORT).show();
+                    MapActivity.this.finish();
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.e("error", "" + error);
+
+                    Toast.makeText(MapActivity.this, "Something went wrong.", Toast.LENGTH_SHORT).show();
+
+                }
+            }) {
+
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+
+                    Map<String, String> header = new HashMap<>();
+                    header.put("content-type",
+                            "application/json");
+
+                    return header;
+                }
+            };
+
+            RetryPolicy retryPolicy = new DefaultRetryPolicy(
+                    AppController.VOLLEY_TIMEOUT,
+                    AppController.VOLLEY_MAX_RETRIES,
+                    AppController.VOLLEY_BACKUP_MULT);
+            request.setRetryPolicy(retryPolicy);
+            AppController.getInstance().addToRequestQueue(request);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
     }
