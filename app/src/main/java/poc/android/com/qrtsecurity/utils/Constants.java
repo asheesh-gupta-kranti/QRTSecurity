@@ -39,5 +39,6 @@ public class Constants {
     public static final String fcmId = "fcmId";
     public static final String lat = "LATITUDE";
     public static final String lng = "LONGITUDE";
+    public static final String tripData = "tripData";
 
 ;}

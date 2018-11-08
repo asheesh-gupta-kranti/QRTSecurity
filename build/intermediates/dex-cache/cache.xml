@@ -1,0 +1,335 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        is-multidex="false"
+        jar="/home/djubo/.gradle/caches/transforms-1/files-1.1/cardview-v7-27.1.1.aar/633b8ed18cb1e76d58846edce0634112/jars/classes.jar"
+        jumboMode="false"
+        min-sdk-version="16"
+        optimize="true"
+        revision="26.0.2"
+        sha1="4798b2c2dd1fa53176696fa416890d27acbf5617">
+        <dex dex="/home/djubo/Asheesh/workspace/QRTSecurity/app/build/intermediates/transforms/preDex/release/10.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/home/djubo/.gradle/caches/transforms-1/files-1.1/play-services-basement-12.0.1.aar/af0449852c415ca8ee0fae58fdbd247a/jars/classes.jar"
+        jumboMode="false"
+        min-sdk-version="16"
+        optimize="true"
+        revision="26.0.2"
+        sha1="22569eca3029ab00583c332a2be220cdbf091b35">
+        <dex dex="/home/djubo/Asheesh/workspace/QRTSecurity/app/build/intermediates/transforms/preDex/release/17.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/home/djubo/.gradle/caches/transforms-1/files-1.1/firebase-common-12.0.1.aar/1695c1c0b9975375c2432127f174bbb4/jars/classes.jar"
+        jumboMode="false"
+        min-sdk-version="16"
+        optimize="true"
+        revision="26.0.2"
+        sha1="d8ec04dc91c0c90a0ceeca77c94c8b15cb7f3892">
+        <dex dex="/home/djubo/Asheesh/workspace/QRTSecurity/app/build/intermediates/transforms/preDex/release/15.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/home/djubo/.gradle/caches/modules-2/files-2.1/com.android.support/support-annotations/27.1.1/39ded76b5e1ce1c5b2688e1d25cdc20ecee32007/support-annotations-27.1.1.jar"
+        jumboMode="false"
+        min-sdk-version="16"
+        optimize="true"
+        revision="26.0.2"
+        sha1="39ded76b5e1ce1c5b2688e1d25cdc20ecee32007">
+        <dex dex="/home/djubo/Asheesh/workspace/QRTSecurity/app/build/intermediates/transforms/preDex/release/31.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/home/djubo/.gradle/caches/transforms-1/files-1.1/play-services-base-12.0.1.aar/4c717392e5191d87b088857218b147db/jars/classes.jar"
+        jumboMode="false"
+        min-sdk-version="16"
+        optimize="true"
+        revision="26.0.2"
+        sha1="ed8395f343c428cd55c60499f04323083f4ef0db">
+        <dex dex="/home/djubo/Asheesh/workspace/QRTSecurity/app/build/intermediates/transforms/preDex/release/11.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/home/djubo/.gradle/caches/modules-2/files-2.1/com.android.support.constraint/constraint-layout-solver/1.1.2/bfc967828daffc35ba01c9ee204d98b664930a0f/constraint-layout-solver-1.1.2.jar"
+        jumboMode="false"
+        min-sdk-version="16"
+        optimize="true"
+        revision="26.0.2"
+        sha1="bfc967828daffc35ba01c9ee204d98b664930a0f">
+        <dex dex="/home/djubo/Asheesh/workspace/QRTSecurity/app/build/intermediates/transforms/preDex/release/32.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/home/djubo/.gradle/caches/transforms-1/files-1.1/support-media-compat-27.1.1.aar/d50b428f685ce94541226abcc26171b9/jars/classes.jar"
+        jumboMode="false"
+        min-sdk-version="16"
+        optimize="true"
+        revision="26.0.2"
+        sha1="88c68e5ef7c5ace393d014c9ec5fe736b1ca55cf">
+        <dex dex="/home/djubo/Asheesh/workspace/QRTSecurity/app/build/intermediates/transforms/preDex/release/29.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/home/djubo/.gradle/caches/transforms-1/files-1.1/recyclerview-v7-27.1.1.aar/7b426481b142a97af62879e8b77226f7/jars/classes.jar"
+        jumboMode="false"
+        min-sdk-version="16"
+        optimize="true"
+        revision="26.0.2"
+        sha1="4d2b8ad415048e88b41ba4afcaafe36150e69b8c">
+        <dex dex="/home/djubo/Asheesh/workspace/QRTSecurity/app/build/intermediates/transforms/preDex/release/19.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/home/djubo/.gradle/caches/transforms-1/files-1.1/firebase-analytics-12.0.1.aar/015a0dd3e15adc907501aba89940ef25/jars/classes.jar"
+        jumboMode="false"
+        min-sdk-version="16"
+        optimize="true"
+        revision="26.0.2"
+        sha1="4c9dde3866f60967d73035b3445bb0f703429612">
+        <dex dex="/home/djubo/Asheesh/workspace/QRTSecurity/app/build/intermediates/transforms/preDex/release/12.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/home/djubo/.gradle/caches/transforms-1/files-1.1/animated-vector-drawable-27.1.1.aar/86fd6459351f0d3b3927f12e3c0d4485/jars/classes.jar"
+        jumboMode="false"
+        min-sdk-version="16"
+        optimize="true"
+        revision="26.0.2"
+        sha1="2feadd535770271ca57b7b431f42151aa4af324a">
+        <dex dex="/home/djubo/Asheesh/workspace/QRTSecurity/app/build/intermediates/transforms/preDex/release/25.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/home/djubo/.gradle/caches/transforms-1/files-1.1/runtime-1.1.0.aar/5634e713a26890f2feddba49f33e1ec7/jars/classes.jar"
+        jumboMode="false"
+        min-sdk-version="16"
+        optimize="true"
+        revision="26.0.2"
+        sha1="e2bbe48deed35056023eed2cdc0cc92e5c7d3617">
+        <dex dex="/home/djubo/Asheesh/workspace/QRTSecurity/app/build/intermediates/transforms/preDex/release/41.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/home/djubo/.gradle/caches/transforms-1/files-1.1/firebase-messaging-12.0.1.aar/32d49f59e676963761d3fe2dfce7a92d/jars/classes.jar"
+        jumboMode="false"
+        min-sdk-version="16"
+        optimize="true"
+        revision="26.0.2"
+        sha1="e1086213a85bf2bfc3f6448d66581198ba380f69">
+        <dex dex="/home/djubo/Asheesh/workspace/QRTSecurity/app/build/intermediates/transforms/preDex/release/6.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/home/djubo/.gradle/caches/transforms-1/files-1.1/support-core-ui-27.1.1.aar/aa44f1ceae7ca2d9e6de5d339336d5e1/jars/classes.jar"
+        jumboMode="false"
+        min-sdk-version="16"
+        optimize="true"
+        revision="26.0.2"
+        sha1="874f1143c11f5d38533efe512bf913e3e847e7df">
+        <dex dex="/home/djubo/Asheesh/workspace/QRTSecurity/app/build/intermediates/transforms/preDex/release/26.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/home/djubo/.gradle/caches/transforms-1/files-1.1/firebase-analytics-impl-12.0.1.aar/be09d62972e6f09ee810fa97bd9cb71d/jars/classes.jar"
+        jumboMode="false"
+        min-sdk-version="16"
+        optimize="true"
+        revision="26.0.2"
+        sha1="43777ad2c3f87b64ced35a875ce2befa178a23da">
+        <dex dex="/home/djubo/Asheesh/workspace/QRTSecurity/app/build/intermediates/transforms/preDex/release/13.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/home/djubo/.gradle/caches/transforms-1/files-1.1/support-vector-drawable-27.1.1.aar/854a4f5db9e68e37c4a6b33e2750fed4/jars/classes.jar"
+        jumboMode="false"
+        min-sdk-version="16"
+        optimize="true"
+        revision="26.0.2"
+        sha1="c9a721adcd7dbae7a197b0ef81102336539f63ff">
+        <dex dex="/home/djubo/Asheesh/workspace/QRTSecurity/app/build/intermediates/transforms/preDex/release/28.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/home/djubo/.gradle/caches/modules-2/files-2.1/android.arch.core/common/1.1.0/8007981f7d7540d89cd18471b8e5dcd2b4f99167/common-1.1.0.jar"
+        jumboMode="false"
+        min-sdk-version="16"
+        optimize="true"
+        revision="26.0.2"
+        sha1="8007981f7d7540d89cd18471b8e5dcd2b4f99167">
+        <dex dex="/home/djubo/Asheesh/workspace/QRTSecurity/app/build/intermediates/transforms/preDex/release/45.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/home/djubo/.gradle/caches/transforms-1/files-1.1/viewmodel-1.1.0.aar/c8aaab842ec1854e5bfbe08db8c19c36/jars/classes.jar"
+        jumboMode="false"
+        min-sdk-version="16"
+        optimize="true"
+        revision="26.0.2"
+        sha1="1fd3ceac7f415975323d52c6c6057db409a907f6">
+        <dex dex="/home/djubo/Asheesh/workspace/QRTSecurity/app/build/intermediates/transforms/preDex/release/40.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/home/djubo/.gradle/caches/transforms-1/files-1.1/support-core-utils-27.1.1.aar/9899cff8b4f77a40e0a896cc257f1c7e/jars/classes.jar"
+        jumboMode="false"
+        min-sdk-version="16"
+        optimize="true"
+        revision="26.0.2"
+        sha1="ec657bb192b20229696216bf233779b16bf75a54">
+        <dex dex="/home/djubo/Asheesh/workspace/QRTSecurity/app/build/intermediates/transforms/preDex/release/27.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/home/djubo/.gradle/caches/transforms-1/files-1.1/play-services-maps-12.0.1.aar/5088ffb4c067ed3f083d8b59e71f4f04/jars/classes.jar"
+        jumboMode="false"
+        min-sdk-version="16"
+        optimize="true"
+        revision="26.0.2"
+        sha1="fc421b0511f4e492d097c84702b2a00f101fe08a">
+        <dex dex="/home/djubo/Asheesh/workspace/QRTSecurity/app/build/intermediates/transforms/preDex/release/4.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/home/djubo/.gradle/caches/transforms-1/files-1.1/support-fragment-27.1.1.aar/5444510700ec011f939492a960df9a9e/jars/classes.jar"
+        jumboMode="false"
+        min-sdk-version="16"
+        optimize="true"
+        revision="26.0.2"
+        sha1="3304d33470ff64cf83bce9189ff3648a42eb2aa7">
+        <dex dex="/home/djubo/Asheesh/workspace/QRTSecurity/app/build/intermediates/transforms/preDex/release/24.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/home/djubo/.gradle/caches/transforms-1/files-1.1/appcompat-v7-27.1.1.aar/0e3d77119b1b17a442fc62211eb4ed71/jars/classes.jar"
+        jumboMode="false"
+        min-sdk-version="16"
+        optimize="true"
+        revision="26.0.2"
+        sha1="d968b9bd0011800e0d333d1571b8d34bcb8a0b6e">
+        <dex dex="/home/djubo/Asheesh/workspace/QRTSecurity/app/build/intermediates/transforms/preDex/release/8.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/home/djubo/.gradle/caches/modules-2/files-2.1/com.google.code.gson/gson/2.3.1/ecb6e1f8e4b0e84c4b886c2f14a1500caf309757/gson-2.3.1.jar"
+        jumboMode="false"
+        min-sdk-version="16"
+        optimize="true"
+        revision="26.0.2"
+        sha1="ecb6e1f8e4b0e84c4b886c2f14a1500caf309757">
+        <dex dex="/home/djubo/Asheesh/workspace/QRTSecurity/app/build/intermediates/transforms/preDex/release/3.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/home/djubo/.gradle/caches/transforms-1/files-1.1/constraint-layout-1.1.2.aar/ec2a5d240ca4ca153a9d5b48a67bada0/jars/classes.jar"
+        jumboMode="false"
+        min-sdk-version="16"
+        optimize="true"
+        revision="26.0.2"
+        sha1="182370a4a0bba7903c6ff2cb7b6ac21ca4a4bf89">
+        <dex dex="/home/djubo/Asheesh/workspace/QRTSecurity/app/build/intermediates/transforms/preDex/release/9.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/home/djubo/.gradle/caches/transforms-1/files-1.1/volley-1.1.1.aar/f1489a951f9bf64697974bbf139019a1/jars/classes.jar"
+        jumboMode="false"
+        min-sdk-version="16"
+        optimize="true"
+        revision="26.0.2"
+        sha1="a6a1348ac6f3e2890a2cd7637b1e18f969ccc1e5">
+        <dex dex="/home/djubo/Asheesh/workspace/QRTSecurity/app/build/intermediates/transforms/preDex/release/2.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/home/djubo/.gradle/caches/transforms-1/files-1.1/play-services-location-12.0.1.aar/0afdcd34b37a473959a9743f6d980f39/jars/classes.jar"
+        jumboMode="false"
+        min-sdk-version="16"
+        optimize="true"
+        revision="26.0.2"
+        sha1="16f423bae182fd81553d109269f7a5e13fd1cb52">
+        <dex dex="/home/djubo/Asheesh/workspace/QRTSecurity/app/build/intermediates/transforms/preDex/release/5.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/home/djubo/.gradle/caches/transforms-1/files-1.1/support-compat-27.1.1.aar/cff93bb43a9e3c626e0c2572fa2c0a9b/jars/classes.jar"
+        jumboMode="false"
+        min-sdk-version="16"
+        optimize="true"
+        revision="26.0.2"
+        sha1="23dcb4803d3103bde3f3f5db978a726338fe49ae">
+        <dex dex="/home/djubo/Asheesh/workspace/QRTSecurity/app/build/intermediates/transforms/preDex/release/30.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/home/djubo/.gradle/caches/transforms-1/files-1.1/design-27.1.1.aar/1a0c6802bd89fc1a3500dc0fd98b5482/jars/classes.jar"
+        jumboMode="false"
+        min-sdk-version="16"
+        optimize="true"
+        revision="26.0.2"
+        sha1="ae6d33f37143b08cd8c477c9e348d61ef7ed7eba">
+        <dex dex="/home/djubo/Asheesh/workspace/QRTSecurity/app/build/intermediates/transforms/preDex/release/1.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/home/djubo/.gradle/caches/modules-2/files-2.1/android.arch.lifecycle/common/1.1.0/edf3f7bfb84a7521d0599efa3b0113a0ee90f85/common-1.1.0.jar"
+        jumboMode="false"
+        min-sdk-version="16"
+        optimize="true"
+        revision="26.0.2"
+        sha1="0edf3f7bfb84a7521d0599efa3b0113a0ee90f85">
+        <dex dex="/home/djubo/Asheesh/workspace/QRTSecurity/app/build/intermediates/transforms/preDex/release/43.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/home/djubo/.gradle/caches/transforms-1/files-1.1/transition-27.1.1.aar/5f0ef14d49b8a2c427664d6349bcee11/jars/classes.jar"
+        jumboMode="false"
+        min-sdk-version="16"
+        optimize="true"
+        revision="26.0.2"
+        sha1="7038c6d960d3fe26fd41bc509f256c9692d886ce">
+        <dex dex="/home/djubo/Asheesh/workspace/QRTSecurity/app/build/intermediates/transforms/preDex/release/20.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/home/djubo/.gradle/caches/transforms-1/files-1.1/play-services-tasks-12.0.1.aar/19d50e1ecdaff62b119991568eda048d/jars/classes.jar"
+        jumboMode="false"
+        min-sdk-version="16"
+        optimize="true"
+        revision="26.0.2"
+        sha1="a38a8974c8d066800237d22a86df2e88cb9e065c">
+        <dex dex="/home/djubo/Asheesh/workspace/QRTSecurity/app/build/intermediates/transforms/preDex/release/16.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/home/djubo/.gradle/caches/transforms-1/files-1.1/livedata-core-1.1.0.aar/6ef31a924f6603bab35801063cf82651/jars/classes.jar"
+        jumboMode="false"
+        min-sdk-version="16"
+        optimize="true"
+        revision="26.0.2"
+        sha1="8a9fd7c97f1d13f97f3b52f9d2e54cd857d5acf9">
+        <dex dex="/home/djubo/Asheesh/workspace/QRTSecurity/app/build/intermediates/transforms/preDex/release/39.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/home/djubo/.gradle/caches/transforms-1/files-1.1/runtime-1.1.0.aar/eab4a35e23c9b0725a63b3f79612cf7a/jars/classes.jar"
+        jumboMode="false"
+        min-sdk-version="16"
+        optimize="true"
+        revision="26.0.2"
+        sha1="71d380aeac037e63bab7bda2ba211777e16a2f42">
+        <dex dex="/home/djubo/Asheesh/workspace/QRTSecurity/app/build/intermediates/transforms/preDex/release/44.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/home/djubo/.gradle/caches/transforms-1/files-1.1/firebase-iid-12.0.1.aar/adb28e739f19ccad08fe5fa60bcdf7ec/jars/classes.jar"
+        jumboMode="false"
+        min-sdk-version="16"
+        optimize="true"
+        revision="26.0.2"
+        sha1="b739661c7142579d33f42801cfb71882cd217727">
+        <dex dex="/home/djubo/Asheesh/workspace/QRTSecurity/app/build/intermediates/transforms/preDex/release/14.jar" />
+    </item>
+
+</items>

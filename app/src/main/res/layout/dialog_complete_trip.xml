@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/white"
+    android:padding="10dp">
+
+    <TextView
+        android:id="@+id/tv_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="To complete the trip, please enter OTP."
+        android:textSize="17sp"
+        android:layout_marginLeft="8dp"/>
+
+    <EditText
+        android:id="@+id/et_otp"
+        android:layout_below="@+id/tv_message"
+        android:layout_width="match_parent"
+        android:inputType="number"
+        android:layout_marginTop="10dp"
+        android:layout_height="40dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_below="@+id/et_otp"
+        android:gravity="center">
+
+        <Button
+            android:id="@+id/btn_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="cancel"
+            android:theme="@style/PrimaryFlatButtonNegative" />
+
+
+        <Button
+            android:id="@+id/btn_submit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Submit"
+            android:theme="@style/PrimaryFlatButton" />
+
+
+
+    </LinearLayout>
+
+
+</RelativeLayout>

@@ -2,6 +2,7 @@ package poc.android.com.qrtsecurity.activities;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -18,6 +19,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
@@ -58,6 +60,8 @@ import java.util.List;
 import java.util.Map;
 
 import poc.android.com.qrtsecurity.AppController;
+import poc.android.com.qrtsecurity.CustomDialog.CompleteTripDialog;
+import poc.android.com.qrtsecurity.CustomDialog.TripInfoCustomDialog;
 import poc.android.com.qrtsecurity.Models.NotificationModel;
 import poc.android.com.qrtsecurity.R;
 import poc.android.com.qrtsecurity.MyFirebaseMessagingService;
@@ -106,7 +110,7 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
         findViewById(R.id.btn_complete_trip).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                postStatus("RESOLVED");
+               openTripCancelDialog(data);
             }
         });
 
@@ -459,6 +463,27 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
             return data;
         }
 
+    private void openTripCancelDialog(NotificationModel data){
+
+        if (data != null) {
+            final CompleteTripDialog tripDialog = new CompleteTripDialog(this, data);
+            tripDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+            tripDialog.setCancelable(false);
+            tripDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                @Override
+                public void onDismiss(DialogInterface dialogInterface) {
+
+                    if (tripDialog.isCancelTrip) {
+                        postStatus("RESOLVED");
+                    }
+
+                }
+            });
+
+            tripDialog.show();
+        }
+    }
+
     private void postStatus(String status) {
 
         try {
@@ -491,7 +516,7 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
                 @Override
                 public void onResponse(JSONObject response) {
                     Log.d("Location response", response.toString());
-
+                    AppPreferencesHandler.setTripData(MapActivity.this, "");
                     Toast.makeText(MapActivity.this, "Successful", Toast.LENGTH_SHORT).show();
                     MapActivity.this.finish();
                 }

@@ -147,8 +147,10 @@ public class ActivateDutyActivity extends AppCompatActivity implements Navigatio
             public void onDismiss(DialogInterface dialogInterface) {
 
                 if (tripDialog.isAccepted){
+                    String tripData = getIntent().getStringExtra(MyFirebaseMessagingService.dataKey);
+                    AppPreferencesHandler.setTripData(ActivateDutyActivity.this, tripData);
                     Intent mapIntent = new Intent(ActivateDutyActivity.this, MapActivity.class);
-                    mapIntent.putExtra(MyFirebaseMessagingService.dataKey, getIntent().getStringExtra(MyFirebaseMessagingService.dataKey));
+                    mapIntent.putExtra(MyFirebaseMessagingService.dataKey, tripData);
                     ActivateDutyActivity.this.startActivity(mapIntent);
                 }
 
@@ -185,12 +187,19 @@ public class ActivateDutyActivity extends AppCompatActivity implements Navigatio
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-//        if (id == R.id.mav_map) {
-//
-//            startActivity(new Intent(this, MapActivity.class));
-//
-//        }  else
-            if (id == R.id.nav_history) {
+        if (id == R.id.mav_map) {
+
+            String tripData = AppPreferencesHandler.getTripData(ActivateDutyActivity.this);
+
+            if (!tripData.isEmpty()) {
+                Intent mapIntent = new Intent(ActivateDutyActivity.this, MapActivity.class);
+                mapIntent.putExtra(MyFirebaseMessagingService.dataKey, tripData);
+                ActivateDutyActivity.this.startActivity(mapIntent);
+            }else{
+                Toast.makeText(this, "No Trip available.", Toast.LENGTH_SHORT).show();
+            }
+
+        }  else if (id == R.id.nav_history) {
 
         }else if (id == R.id.nav_contacts) {
 

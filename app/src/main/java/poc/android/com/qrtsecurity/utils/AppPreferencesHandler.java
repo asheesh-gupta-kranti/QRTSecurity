@@ -195,4 +195,18 @@ public class AppPreferencesHandler {
 
         return latLng;
     }
+
+    public static void setTripData(Context context, String tripData){
+        SharedPreferences pref = context.getSharedPreferences(Constants.parentPreferenceKey,
+                Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = pref.edit();
+        editor.putString(Constants.tripData, tripData);
+        editor.apply();
+    }
+
+    public static String getTripData(Context context) {
+        SharedPreferences prefs = context.getSharedPreferences(Constants.parentPreferenceKey, Context.MODE_PRIVATE);
+        return prefs.getString(Constants.tripData, "");
+    }
+
 }
