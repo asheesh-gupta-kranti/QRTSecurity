@@ -84,7 +84,7 @@ public class ActivateDutyActivity extends AppCompatActivity implements Navigatio
     private boolean isDutyOn = false;
     private Timer timer;
     final Handler handler = new Handler();
-    private boolean isAPIError = false;
+    private boolean isAPIError = false, isRequest = false;
     private ImageLoader mImageLoader;
 
 
@@ -207,6 +207,7 @@ public class ActivateDutyActivity extends AppCompatActivity implements Navigatio
 
         } else if (id == R.id.nav_logout) {
             AppPreferencesHandler.clearData(this);
+            stopLocationService();
             startActivity(new Intent(this, MainActivity.class));
             finish();
         }
@@ -322,7 +323,8 @@ public class ActivateDutyActivity extends AppCompatActivity implements Navigatio
             @Override
             public void run() {
                 //Do something after 300ms
-                if (getIntent().getStringExtra(MyFirebaseMessagingService.dataKey) != null){
+                if (getIntent().getStringExtra(MyFirebaseMessagingService.dataKey) != null && !isRequest){
+                    isRequest = true;
                     NotificationModel data = new Gson().fromJson(getIntent().getStringExtra(MyFirebaseMessagingService.dataKey), NotificationModel.class);
                     openTripInfoDialog(data);
 
