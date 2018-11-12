@@ -24,6 +24,7 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.RetryPolicy;
 import com.android.volley.VolleyError;
+import com.google.android.gms.maps.model.LatLng;
 
 import org.json.JSONObject;
 
@@ -110,6 +111,12 @@ public class ResponderLocationService extends Service {
     public void onCreate() {
 
         Log.e(TAG, "onCreate");
+
+        LatLng latLng = AppPreferencesHandler.getUserLocation(ResponderLocationService.this);
+
+        if (latLng.latitude != 0 && latLng.longitude != 0){
+            postLocation(latLng.latitude, latLng.longitude);
+        }
 
         initializeLocationManager();
 

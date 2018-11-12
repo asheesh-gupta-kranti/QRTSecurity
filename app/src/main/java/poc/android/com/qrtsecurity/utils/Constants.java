@@ -22,6 +22,7 @@ public class Constants {
 
     // Preferences keys
     public static final String parentPreferenceKey = "USER_PREFERENCES";
+    public static final String devicePreferenceKey = "DEVICE_PREFERENCES";
     public static final String isLogin = "isLogin";
     public static final String phoneNumber = "phoneNumber";
     public static final String name = "name";

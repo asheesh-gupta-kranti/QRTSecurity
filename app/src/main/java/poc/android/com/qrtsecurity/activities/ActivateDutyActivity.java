@@ -415,14 +415,7 @@ public class ActivateDutyActivity extends AppCompatActivity implements Navigatio
             switch (apiStatus){
                 case POST_DUTY_API:
                     startDuty();
-                    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
-                            checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)
-                                    != PackageManager.PERMISSION_GRANTED) {
-                        requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                                LOCATION_PERMISSION_CODE);
-                    } else {
-                        startLocationService();
-                    }
+
 
                     getSchedules();
                     Toast.makeText(ActivateDutyActivity.this, "Duty Started.", Toast.LENGTH_SHORT).show();
@@ -440,7 +433,17 @@ public class ActivateDutyActivity extends AppCompatActivity implements Navigatio
 
                         if(isAPIError){
                             putSchedule();
+                        }else {
+                            if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
+                                    checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+                                            != PackageManager.PERMISSION_GRANTED) {
+                                requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                                        LOCATION_PERMISSION_CODE);
+                            } else {
+                                startLocationService();
+                            }
                         }
+
                     }catch (Exception ex){
                         ex.printStackTrace();
                     }
@@ -487,7 +490,7 @@ public class ActivateDutyActivity extends AppCompatActivity implements Navigatio
 
         apiStatus = POST_DUTY_API;
         String url = Constants.baseUrl + String.format(Constants.responderScheduleEndPoint, AppPreferencesHandler.getUserId(this));
-        Log.d("url", url);
+        Log.d("post url", url);
         JSONObject payload = new JSONObject();
 
         Log.d("payload", payload.toString());
@@ -526,8 +529,14 @@ public class ActivateDutyActivity extends AppCompatActivity implements Navigatio
         apiStatus = PUT_DUTY_API;
         String url = Constants.baseUrl + String.format(Constants.responderScheduleEndPoint, AppPreferencesHandler.getUserId(this)) +
                 "/"+ AppPreferencesHandler.getScheduleId(getApplicationContext());
-        Log.d("url", url);
+        Log.d("put url", url);
         JSONObject payload = new JSONObject();
+
+        try{
+            payload.put("currAvail", false);
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
 
         Log.d("payload", payload.toString());
         if (HelperMethods.isNetWorkAvailable(this)) {
@@ -570,7 +579,7 @@ public class ActivateDutyActivity extends AppCompatActivity implements Navigatio
 
         apiStatus = GET_DUTY_API;
         String url = Constants.baseUrl + String.format(Constants.responderScheduleEndPoint, AppPreferencesHandler.getUserId(this));
-        Log.d("url", url);
+        Log.d("get url", url);
         JSONObject payload = new JSONObject();
 
         Log.d("payload", payload.toString());
