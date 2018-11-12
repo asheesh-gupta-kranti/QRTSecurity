@@ -305,6 +305,11 @@ public class ActivateDutyActivity extends AppCompatActivity implements Navigatio
     }
 
     @Override
+    public Intent getIntent() {
+        return super.getIntent();
+    }
+
+    @Override
     protected void onStart() {
         super.onStart();
 
